@@ -1,15 +1,14 @@
 import * as React from 'react';
 import './App.css';
 
-const BASE_PATH = 'https://d2ynczlew6xd8m.cloudfront.net/webUnityExercises/edison_ob';
+const BASE_PATH = 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/unity';
 const LOADER_NAME = 'UnityLoader';
 const CANVAS_ID = 'exercise-canvas';
 
 declare var UnityLoader: any;
 declare var window: {
-  initGame: () => void,
+  appReady: () => void,
   engineReady: () => void,
-  finishLoading: () => void,
   exerciseReady: () => void,
   completeExercise: (result: any) => void,
   exerciseFailed: (e: Error) => void,
@@ -20,6 +19,8 @@ interface IUnityInstance {
 };
 
 interface IAppState {
+  auto: boolean;
+  config: string;
   configPath: string;
   console: string;
   debug: string[];
@@ -28,27 +29,37 @@ interface IAppState {
   start: boolean;
 }
 
+const cacheBusterDict = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function getCacheBuster() {
+  let text = '';
+  for (let index = 0; index < 3; index++) {
+    text += cacheBusterDict.charAt(Math.floor(Math.random() * cacheBusterDict.length));
+  }
+  return text;
+}
+
 class App extends React.Component<{}, IAppState> {
   public instance: IUnityInstance;
   public initTimer: any;
+  public startTimer: any;
   public state: IAppState = {
-    configPath: 'https://d2ynczlew6xd8m.cloudfront.net/webUnityExercises/edison_ob/main_out.json',
+    auto: true,
+    config: '{ "language": "de" }',
+    configPath: 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/unity/main_out.json',
     console: '>',
     debug: [],
-    options: '{ difficulty: 0, mode: "training" }',
-    settings: '{ id: 38, name: "ColorCraze", type: "X", language: "de" }',
+    options: '{ "difficulty": 0, "mode": "training" }',
+    settings: '{ "id": 38, "name": "ColorCraze", "type": "X", "language": "de" }',
     start: false,
   }
 
   constructor(props: {}) {
     super(props);
+    // app started handler
+    window.appReady = this.appReady;
     // 'engine ready' handler
-    window.initGame = this.initExercise;
-    // new name for this handler
-    window.engineReady = this.initExercise;
+    window.engineReady = this.engineReady;
     // 'assets loaded' handler
-    window.finishLoading = this.exerciseReady;
-    // new name for this handler
     window.exerciseReady = this.exerciseReady;
     // exercise callbacks
     window.completeExercise = this.completeExercise;
@@ -58,38 +69,58 @@ class App extends React.Component<{}, IAppState> {
   public startTest = () => {
     this.setState({ start: true });
     const script = document.createElement('script');
-    const loaderPath = BASE_PATH + '/' + LOADER_NAME + '.js';
+    const loaderPath = BASE_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
     script.src = loaderPath;
     script.onload = this.onUnityInitialize;
     script.async = true;
     document.body.appendChild(script);
-    this.log('App started!');
+    this.log('Test started!');
   }
-  
+
   public onUnityInitialize = () => {
     this.log('UnityLoader onLoad called');
     // unity loader script loaded - ready to load engine
-    this.instance = UnityLoader.instantiate(CANVAS_ID, this.state.configPath);
-    this.initTimer = setInterval(() => {
-      const messages = [...this.state.debug];
-      const msg = messages.pop();
-      messages.push(msg + '.');
-      this.setState({
-        debug: [...messages],
-      });
-    }, 500);
+    const path = this.state.configPath + '?rnd=' + getCacheBuster();
+    this.instance = UnityLoader.instantiate(CANVAS_ID, path);
+    this.initTimer = setInterval(this.progress, 500);
+  }
+
+  // 'app ready' handler called when core app loaded
+  public appReady = () => {
+    this.log('appReady called');
+    clearInterval(this.initTimer);
+    this.startTimer = setInterval(this.progress, 500);
+    if (this.state.auto) {
+      this.loadApp();
+    }
   }
 
   // 'engine ready' handler called when engine finished loading
-  public initExercise = () => {
-    this.log('initExercise called');
+  public engineReady = () => {
+    this.log('engineReady called');
+    clearInterval(this.startTimer);
     clearInterval(this.initTimer);
-    this.exerciseInit(this.state.settings);
+    if (this.state.auto) {
+      this.loadExercise();
+    }
   }
 
   // 'assets loaded' handler called when exercise assets were loaded
   public exerciseReady = () => {
     this.log('exerciseReady called');
+    clearInterval(this.startTimer);
+    clearInterval(this.initTimer);
+    if (this.state.auto) {
+      this.startExercise();
+    }
+  }
+
+  public loadApp = () => {
+    this.appInit(this.state.config);
+  }
+
+  public loadExercise = () => {
+    this.exerciseInit(this.state.settings);
   }
 
   public startExercise = () => {
@@ -118,11 +149,18 @@ class App extends React.Component<{}, IAppState> {
         </header>
         <div className="controls">
           <div className="controls-row">
-            <label>config path: <input value={this.state.configPath} onChange={this.handleInputChange('configPath')} /></label>&nbsp;
-            <button onClick={this.startTest}>init</button>
+            <label>auto execute: <input type="checkbox" checked={this.state.auto} onChange={this.handleCheckboxChange('auto')} /></label>&nbsp;
+            <button onClick={this.startTest}>initialize</button>
+          </div>
+          <div className="controls-row">
+            <label>app config: <input value={this.state.config} onChange={this.handleInputChange('config')} /></label>&nbsp;
+            <button onClick={this.loadApp}>load app</button>
           </div>
           <div className="controls-row">
             <label>settings: <input value={this.state.settings} onChange={this.handleInputChange('settings')} /></label>&nbsp;
+            <button onClick={this.loadExercise}>load exercise</button>
+          </div>
+          <div className="controls-row">
             <label>options: <input value={this.state.options} onChange={this.handleInputChange('options')} /></label>&nbsp;
             <button onClick={this.startExercise}>start exercise</button>
           </div>
@@ -135,6 +173,12 @@ class App extends React.Component<{}, IAppState> {
         </div>
       </div>
     );
+  }
+
+  private handleCheckboxChange = (input: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const statePart = {};
+    statePart[input] = !!e.target.checked;
+    this.setState(statePart);
   }
 
   private handleInputChange = (input: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,9 +223,18 @@ class App extends React.Component<{}, IAppState> {
   }
 
   // wrappers for internal exercises function calls
+  private appInit = (config: any) => this.sendMessage('Main', 'InitializeApp', config);
   private exerciseInit = (settings: any) => this.sendMessage('Main', 'Initialize', settings);
   private exerciseStart = (options: any) => this.sendMessage('Main', 'StartExercise', options);
 
+  private progress = () => {
+    const messages = [...this.state.debug];
+    const msg = messages.pop();
+    messages.push(msg + '.');
+    this.setState({
+      debug: [...messages],
+    });
+  }
 }
 
 export default App;
