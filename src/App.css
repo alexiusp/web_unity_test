@@ -1,0 +1,43 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #222;
+  height: 30px;
+  padding: 10px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.2em;
+}
+
+.controls {
+  padding: 10px;
+}
+
+.controls-row {
+  padding: 2px 0;
+}
+
+.unity {
+  width: 640px;
+  height: 480px;
+  display: block;
+  border: 1px solid #222;
+  margin: 0 auto;
+}
+
+.debug-console {
+  background: #222;
+  color: #00FF00;
+  font-family: 'Courier New', Courier, monospace;
+  white-space: pre-wrap;
+  margin: 10px auto;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
