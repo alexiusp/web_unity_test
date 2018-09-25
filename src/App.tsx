@@ -25,6 +25,7 @@ interface IAppState {
   console: string;
   debug: string[];
   options: string;
+  progress: number;
   settings: string;
   start: boolean;
 }
@@ -49,6 +50,7 @@ class App extends React.Component<{}, IAppState> {
     console: '>',
     debug: [],
     options: '{ "difficulty": 0, "mode": "training" }',
+    progress: 0,
     settings: '{ "id": 38, "name": "ColorCraze", "type": "X", "language": "de" }',
     start: false,
   }
@@ -77,11 +79,15 @@ class App extends React.Component<{}, IAppState> {
     this.log('Test started!');
   }
 
+  public onUnityProgress = (instance: IUnityInstance, progress: number) => {
+    this.setState({ progress });
+  }
+
   public onUnityInitialize = () => {
     this.log('UnityLoader onLoad called');
     // unity loader script loaded - ready to load engine
     const path = this.state.configPath + '?rnd=' + getCacheBuster();
-    this.instance = UnityLoader.instantiate(CANVAS_ID, path);
+    this.instance = UnityLoader.instantiate(CANVAS_ID, path, { onProgress: this.onUnityProgress });
     this.initTimer = setInterval(this.progress, 500);
   }
 
@@ -164,6 +170,9 @@ class App extends React.Component<{}, IAppState> {
             <label>options: <input value={this.state.options} onChange={this.handleInputChange('options')} /></label>&nbsp;
             <button onClick={this.startExercise}>start exercise</button>
           </div>
+        </div>
+        <div className="progress-container">
+          <div className="progress-handle" style={{ width: (this.state.progress * 100) + '%' }} />
         </div>
         <div className="unity">
           <canvas id={CANVAS_ID} />
