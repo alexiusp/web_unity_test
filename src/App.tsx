@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './App.css';
 
-const BASE_PATH = 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain';
+const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain') + '/Build';
 const LOADER_NAME = 'UnityLoader';
 const CANVAS_ID = 'exercise-canvas';
 
@@ -45,7 +45,7 @@ class App extends React.Component<{}, IAppState> {
   public state: IAppState = {
     auto: true,
     config: '{ "language": "de" }',
-    configPath: 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain/Build/Production.json',
+    configPath: `${BASE_PATH}/Production.json`,
     console: '>',
     debug: [],
     options: '{ "difficulty": 0, "mode": "training" }',
