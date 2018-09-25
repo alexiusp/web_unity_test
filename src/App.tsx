@@ -224,7 +224,7 @@ class App extends React.Component<{}, IAppState> {
 
   // wrappers for internal exercises function calls
   private appInit = (config: any) => this.sendMessage('Main', 'InitializeApp', config);
-  private exerciseInit = (settings: any) => this.sendMessage('Main', 'Initialize', settings);
+  private exerciseInit = (settings: any) => this.sendMessage('Main', 'InitializeExercise', settings);
   private exerciseStart = (options: any) => this.sendMessage('Main', 'StartExercise', options);
 
   private progress = () => {
