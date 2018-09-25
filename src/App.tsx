@@ -1,7 +1,8 @@
 import * as React from 'react';
 import './App.css';
 
-const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain') + '/Build';
+const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
+const BUILD_PATH = BASE_PATH + '/Build';
 const LOADER_NAME = 'UnityLoader';
 const CANVAS_ID = 'exercise-canvas';
 
@@ -45,13 +46,22 @@ class App extends React.Component<{}, IAppState> {
   public startTimer: any;
   public state: IAppState = {
     auto: true,
-    config: '{ "language": "de" }',
-    configPath: `${BASE_PATH}/Production.json`,
+    config: JSON.stringify({
+      basePath: BASE_PATH,
+      language: 'de',
+    }),
+    configPath: `${BUILD_PATH}/Production.json`,
     console: '>',
     debug: [],
     options: '{ "difficulty": 0, "mode": "training" }',
     progress: 0,
-    settings: '{ "id": 38, "name": "ColorCraze", "type": "X", "language": "de" }',
+    settings: JSON.stringify({
+      bundles: [
+        "Bundles/memoflow"
+      ],
+      config: "Configs/Memoflow.json",
+      id: "Memoflow",
+    }),
     start: false,
   }
 
@@ -71,7 +81,7 @@ class App extends React.Component<{}, IAppState> {
   public startTest = () => {
     this.setState({ start: true });
     const script = document.createElement('script');
-    const loaderPath = BASE_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
+    const loaderPath = BUILD_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
     script.src = loaderPath;
     script.onload = this.onUnityInitialize;
     script.async = true;
