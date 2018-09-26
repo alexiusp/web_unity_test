@@ -20,7 +20,7 @@ export interface Props extends IControlsState {
 }
 
 export function ControlsPanel(props: Props) {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target.name;
     const handlerName = `on${input}Change`;
     const value = e.target.value;
@@ -35,15 +35,15 @@ export function ControlsPanel(props: Props) {
           <button onClick={props.onStop}>stop</button>
         </div>
         <div className="controls-row">
-          <label>app config: <input name="Config" value={props.config} onChange={handleInputChange} /></label>&nbsp;
+          <label>app config: <textarea name="Config" value={props.config} onChange={handleInputChange} /></label>&nbsp;
             <button onClick={props.onInitializeApp}>initialize app</button>
         </div>
         <div className="controls-row">
-          <label>settings: <input name="Settings" value={props.settings} onChange={handleInputChange} /></label>&nbsp;
+          <label>settings: <textarea name="Settings" value={props.settings} onChange={handleInputChange} /></label>&nbsp;
             <button onClick={props.onInitializeExercise}>initialize exercise</button>
         </div>
         <div className="controls-row">
-          <label>options: <input name="Options" value={props.options} onChange={handleInputChange} /></label>&nbsp;
+          <label>options: <textarea name="Options" value={props.options} onChange={handleInputChange} /></label>&nbsp;
             <button onClick={props.onStartExercise}>start exercise</button>
         </div>
       </div>
