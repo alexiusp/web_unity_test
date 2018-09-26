@@ -4,6 +4,10 @@ import actionBuilder from './actionBuilder';
 export const CONSOLE_LOG = 'CONSOLE_LOG';
 export const consoleLog = actionBuilder<{ message: string }>(CONSOLE_LOG, 'message');
 
+// console log an error action
+export const CONSOLE_ERROR = 'CONSOLE_ERROR';
+export const consoleError = actionBuilder<{ message: string }>(CONSOLE_ERROR, 'message');
+
 // console input value update
 export const CONSOLE_INPUT_UPDATE = 'CONSOLE_INPUT_UPDATE';
 export const consoleInputUpdate = actionBuilder<{ value: string }>(CONSOLE_INPUT_UPDATE, 'value');

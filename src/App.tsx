@@ -10,7 +10,7 @@ import { getControls } from './state/selectors/controls';
 
 import './App.css';
 import ConsoleContainer from './console/ConsoleContainer';
-import { consoleLog } from './state/actions/console';
+import { consoleError, consoleLog } from './state/actions/console';
 
 const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
 const BUILD_PATH = BASE_PATH + '/Build';
@@ -33,6 +33,7 @@ interface IUnityInstance {
 
 export interface Props extends IControlsState {
   onLog: DataCallback;
+  onError: DataCallback;
 }
 
 export interface State {
@@ -150,7 +151,7 @@ class App extends React.Component<Props, State> {
 
   public onError = (e: Error) => {
     this.stopTimers();
-    this.props.onLog(`Error: ${e.message}`);
+    this.props.onError(`Error: ${e.message}`);
   }
 
   public componentDidCatch(e: Error) {
@@ -188,7 +189,7 @@ class App extends React.Component<Props, State> {
       this.props.onLog(`calling SendMessage('${objectName}', '${methodName}', '${params}')`);
       this.instance.SendMessage(objectName, methodName, params);
     } else {
-      this.props.onLog('Error: Trying to send message to not initialized instance');
+      this.props.onError('Error: Trying to send message to not initialized instance');
     }
   }
 
@@ -227,6 +228,10 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     onLog: (msg: string) => {
       Logger.log(msg);
       dispatch(consoleLog(msg));
+    },
+    onError: (msg: string) => {
+      Logger.log(msg);
+      dispatch(consoleError(msg));
     },
   }
 }
