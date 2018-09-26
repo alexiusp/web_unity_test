@@ -24,7 +24,7 @@ export class LoggerClass {
   }
 
   public log(msg: string) {
-    console.info('[Application log] ', msg);
+    console.log('[Application log] ', msg);
     this.add(msg, LogType.Log);
   }
 

@@ -1,12 +1,16 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import ControlsPanel from './controls/ControlsPanel';
 import Logger from './Logger';
+import { DataCallback } from './state/models/base';
 import { IAppState, IControlsState } from './state/models/state';
 import { getControls } from './state/selectors/controls';
 
 import './App.css';
+import ConsoleContainer from './console/ConsoleContainer';
+import { consoleLog } from './state/actions/console';
 
 const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
 const BUILD_PATH = BASE_PATH + '/Build';
@@ -26,11 +30,11 @@ interface IUnityInstance {
   SendMessage: (objectName: string, methodName: string, value: string) => void,
 };
 
-type Props = IControlsState;
-/*
+
 export interface Props extends IControlsState {
+  onLog: DataCallback;
 }
-*/
+
 export interface State {
   configPath: string;
   console: string;
@@ -81,13 +85,13 @@ class App extends React.Component<Props, State> {
     script.onload = this.onUnityInitialize;
     script.async = true;
     document.body.appendChild(script);
-    Logger.log('Test started!');
+    this.props.onLog('Test started!');
   }
 
   public stopTest = () => {
     this.stopTimers();
     this.setState({ start: false });
-    Logger.log('Stop!');
+    this.props.onLog('Stop!');
   }
 
   public onUnityProgress = (instance: IUnityInstance, progress: number) => {
@@ -95,7 +99,7 @@ class App extends React.Component<Props, State> {
   }
 
   public onUnityInitialize = () => {
-    Logger.log('UnityLoader onLoad called');
+    this.props.onLog('UnityLoader onLoad called');
     // unity loader script loaded - ready to load engine
     const path = this.state.configPath + '?rnd=' + getCacheBuster();
     this.instance = UnityLoader.instantiate(CANVAS_ID, path, { onProgress: this.onUnityProgress });
@@ -105,7 +109,7 @@ class App extends React.Component<Props, State> {
   // 'app ready' handler called when core app loaded
   public appReady = () => {
     this.stopTimers();
-    Logger.log('appReady called');
+    this.props.onLog('appReady called');
     this.startTimer = setInterval(this.onTimer, 500);
     if (this.props.auto) {
       this.loadApp();
@@ -115,7 +119,7 @@ class App extends React.Component<Props, State> {
   // 'engine ready' handler called when engine finished loading
   public engineReady = () => {
     this.stopTimers();
-    Logger.log('engineReady called');
+    this.props.onLog('engineReady called');
     if (this.props.auto) {
       this.loadExercise();
     }
@@ -124,7 +128,7 @@ class App extends React.Component<Props, State> {
   // 'assets loaded' handler called when exercise assets were loaded
   public exerciseReady = () => {
     this.stopTimers();
-    Logger.log('exerciseReady called');
+    this.props.onLog('exerciseReady called');
     if (this.props.auto) {
       this.startExercise();
     }
@@ -143,12 +147,12 @@ class App extends React.Component<Props, State> {
   }
 
   public completeExercise = (result: any) => {
-    Logger.log(`completeExercise: ${JSON.stringify(result)}`);
+    this.props.onLog(`completeExercise: ${JSON.stringify(result)}`);
   }
 
   public onError = (e: Error) => {
     this.stopTimers();
-    Logger.log(`Error: ${e.message}`);
+    this.props.onLog(`Error: ${e.message}`);
   }
 
   public componentDidCatch(e: Error) {
@@ -156,7 +160,6 @@ class App extends React.Component<Props, State> {
   }
 
   public render() {
-    const debug = Logger.print();
     return (
       <div className="app">
         <header className="app-header">
@@ -175,14 +178,12 @@ class App extends React.Component<Props, State> {
         <div className="exercise">
           <div id={CANVAS_ID} />
         </div>
-        <div className="debug">
-          <pre className="debug-console">{debug}</pre>
-          <input id="debug-input" className="debug-input" type="text" value={this.state.console} onKeyPress={this.handleConsoleKey} onChange={this.handleConsoleChange} />
-        </div>
+        <ConsoleContainer />
       </div>
     );
   }
 
+  /*
   private handleConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
     // e.stopPropagation();
     // e.preventDefault();
@@ -196,19 +197,19 @@ class App extends React.Component<Props, State> {
     }
     const cmd = (`${this.state.console}`).slice(1);
     this.setState({ console: '>' });
-    Logger.log(`Unknown command: ${cmd}`);
+    this.props.onLog(`Unknown command: ${cmd}`);
     // e.stopPropagation();
     // e.preventDefault();
   }
-
+  */
   // sending messages to game instance
   private sendMessage: (objectName: string, methodName: string, value: any) => void = (objectName, methodName, value) => {
     if (this.instance) {
       const params = typeof value === 'string' ? value : JSON.stringify(value);
-      Logger.log(`calling SendMessage('${objectName}', '${methodName}', '${params}')`);
+      this.props.onLog(`calling SendMessage('${objectName}', '${methodName}', '${params}')`);
       this.instance.SendMessage(objectName, methodName, params);
     } else {
-      Logger.log('Error: Trying to send message to not initialized instance');
+      this.props.onLog('Error: Trying to send message to not initialized instance');
     }
   }
 
@@ -242,4 +243,13 @@ export const mapStateToProps = (state: IAppState) => {
   };
 }
 
-export default connect(mapStateToProps)(App);
+export const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    onLog: (msg: string) => {
+      Logger.log(msg);
+      dispatch(consoleLog(msg));
+    },
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

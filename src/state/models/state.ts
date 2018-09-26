@@ -1,3 +1,5 @@
+import { ILoggerMessage } from './console';
+
 export interface IControlsState {
   auto: boolean;
   config: string;
@@ -6,6 +8,12 @@ export interface IControlsState {
   start: boolean;
 }
 
+export interface IConsoleState {
+  lines: ILoggerMessage[];
+  input: string;
+}
+
 export interface IAppState {
   controls: IControlsState;
+  console: IConsoleState;
 }
