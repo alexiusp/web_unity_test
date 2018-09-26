@@ -1,14 +1,14 @@
 import { reduce } from 'lodash';
 import { ActionType, IAction, IBaseAction } from '../models/actions';
 
-/**
- * factory function to create actions in consistent way
- * @param type type of the action to create
- * @param argNames list of arguments names to be provided to the action (can be undefined)
- */
-export default function actionBuilder<P>(type: ActionType, ...argNames: Array<keyof P>) {
-  if (argNames && argNames.length > 0) {
-    return (...args: any[]) => {
+export type ActionResult<P> = P extends void ? IBaseAction : IAction<P>;
+export type ActionBuilder<P = void> = P extends void ? () => ActionResult<P> : (...args: any[]) => ActionResult<P>;
+
+export function actionBuilder(type: ActionType) : ActionBuilder;
+export function actionBuilder<P>(type: ActionType, ...argNames: Array<keyof P>): ActionBuilder<P>;
+export default function actionBuilder<P = void>(type: ActionType, ...argNames: Array<keyof P>): ActionBuilder<P> {
+  if (argNames.length > 0) {
+    const builder = (...args: any[]) => {
       const payload: P = reduce(argNames, (p, arg: keyof P, index: number) => {
         p[arg] = args[index];
         return p;
@@ -22,10 +22,12 @@ export default function actionBuilder<P>(type: ActionType, ...argNames: Array<ke
       }
       return action;
     }
+    return builder as ActionBuilder<P>;
   } else {
-    return () => {
+    const builder = () => {
       const action: IBaseAction = { type };
       return action;
     }
+    return builder as ActionBuilder<P>;
   }
 }
