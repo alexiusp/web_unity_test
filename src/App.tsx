@@ -1,11 +1,17 @@
 import * as React from 'react';
-import './App.css';
+import { connect } from 'react-redux';
+
+import ControlsPanel from './controls/ControlsPanel';
 import Logger from './Logger';
+import { IAppState, IControlsState } from './state/models/state';
+import { getControls } from './state/selectors/controls';
+
+import './App.css';
 
 const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
 const BUILD_PATH = BASE_PATH + '/Build';
 const LOADER_NAME = 'UnityLoader';
-const CANVAS_ID = 'exercise-canvas';
+const CANVAS_ID = 'exercise';
 
 declare var UnityLoader: any;
 declare var window: {
@@ -20,15 +26,16 @@ interface IUnityInstance {
   SendMessage: (objectName: string, methodName: string, value: string) => void,
 };
 
-interface IAppState {
-  auto: boolean;
-  config: string;
+type Props = IControlsState;
+/*
+export interface Props extends IControlsState {
+}
+*/
+export interface State {
   configPath: string;
   console: string;
   counter: number;
-  options: string;
   progress: number;
-  settings: string;
   start: boolean;
 }
 
@@ -41,32 +48,19 @@ function getCacheBuster() {
   return text;
 }
 
-class App extends React.Component<{}, IAppState> {
+class App extends React.Component<Props, State> {
   public instance: IUnityInstance;
   public initTimer: any;
   public startTimer: any;
-  public state: IAppState = {
-    auto: true,
-    config: JSON.stringify({
-      basePath: BASE_PATH,
-      language: 'de',
-    }),
+  public state: State = {
     configPath: `${BUILD_PATH}/Production.json`,
     console: '>',
     counter: 0,
-    options: '{ "difficulty": 0, "mode": "training" }',
     progress: 0,
-    settings: JSON.stringify({
-      bundles: [
-        "Bundles/memoflow"
-      ],
-      config: "Configs/Memoflow.json",
-      id: "Memoflow",
-    }),
     start: false,
   }
 
-  constructor(props: {}) {
+  constructor(props: Props) {
     super(props);
     // app started handler
     window.appReady = this.appReady;
@@ -113,7 +107,7 @@ class App extends React.Component<{}, IAppState> {
     this.stopTimers();
     Logger.log('appReady called');
     this.startTimer = setInterval(this.onTimer, 500);
-    if (this.state.auto) {
+    if (this.props.auto) {
       this.loadApp();
     }
   }
@@ -122,7 +116,7 @@ class App extends React.Component<{}, IAppState> {
   public engineReady = () => {
     this.stopTimers();
     Logger.log('engineReady called');
-    if (this.state.auto) {
+    if (this.props.auto) {
       this.loadExercise();
     }
   }
@@ -131,21 +125,21 @@ class App extends React.Component<{}, IAppState> {
   public exerciseReady = () => {
     this.stopTimers();
     Logger.log('exerciseReady called');
-    if (this.state.auto) {
+    if (this.props.auto) {
       this.startExercise();
     }
   }
 
   public loadApp = () => {
-    this.appInit(this.state.config);
+    this.appInit(this.props.config);
   }
 
   public loadExercise = () => {
-    this.exerciseInit(this.state.settings);
+    this.exerciseInit(this.props.settings);
   }
 
   public startExercise = () => {
-    this.exerciseStart(this.state.options);
+    this.exerciseStart(this.props.options);
   }
 
   public completeExercise = (result: any) => {
@@ -168,30 +162,18 @@ class App extends React.Component<{}, IAppState> {
         <header className="app-header">
           <h1 className="app-title">UnityLoader test</h1>
         </header>
-        <div className="controls">
-          <div className="controls-row">
-            <label>auto execute: <input name="auto" type="checkbox" checked={this.state.auto} onChange={this.handleCheckboxChange('auto')} /></label>&nbsp;
-            <button onClick={this.startTest}>initialize</button>
-            <button onClick={this.stopTest}>stop</button>
-          </div>
-          <div className="controls-row">
-            <label>app config: <input name="config" value={this.state.config} onChange={this.handleInputChange('config')} /></label>&nbsp;
-            <button onClick={this.loadApp}>load app</button>
-          </div>
-          <div className="controls-row">
-            <label>settings: <input name="settings" value={this.state.settings} onChange={this.handleInputChange('settings')} /></label>&nbsp;
-            <button onClick={this.loadExercise}>load exercise</button>
-          </div>
-          <div className="controls-row">
-            <label>options: <input name="options" value={this.state.options} onChange={this.handleInputChange('options')} /></label>&nbsp;
-            <button onClick={this.startExercise}>start exercise</button>
-          </div>
-        </div>
+        <ControlsPanel
+          onStart={this.startTest}
+          onStop={this.stopTest}
+          onInitializeApp={this.loadApp}
+          onInitializeExercise={this.loadExercise}
+          onStartExercise={this.startExercise}
+        />
         <div className="progress-container">
           <div className="progress-bar" style={{ width: (this.state.progress * 100) + '%' }} />
         </div>
         <div className="exercise">
-          <canvas id={CANVAS_ID} />
+          <div id={CANVAS_ID} />
         </div>
         <div className="debug">
           <pre className="debug-console">{debug}</pre>
@@ -199,18 +181,6 @@ class App extends React.Component<{}, IAppState> {
         </div>
       </div>
     );
-  }
-
-  private handleCheckboxChange = (input: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const statePart = {};
-    statePart[input] = !!e.target.checked;
-    this.setState(statePart);
-  }
-
-  private handleInputChange = (input: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const statePart = {};
-    statePart[input] = e.target.value;
-    this.setState(statePart);
   }
 
   private handleConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,4 +231,15 @@ class App extends React.Component<{}, IAppState> {
 
 }
 
-export default App;
+export const mapStateToProps = (state: IAppState) => {
+  const { auto, config, options, settings, start } = getControls(state);
+  return {
+    auto,
+    config,
+    options,
+    settings,
+    start,
+  };
+}
+
+export default connect(mapStateToProps)(App);

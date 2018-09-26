@@ -3,6 +3,7 @@
   "defaultSeverity": "warning",
   "rules": {
     "interface-name": false,
+    "object-literal-sort-keys": false,
     "no-console": {
       "severity": "warning",
       "options": [

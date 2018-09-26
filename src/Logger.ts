@@ -17,13 +17,14 @@ export class LoggerClass {
   private chunkMatcher: RegExp;
   private counter: number;
 
-  constructor(maxLength: number = 40) {
+  constructor(maxLength: number = 60) {
     this.chunkMatcher = new RegExp('(.{1,' + maxLength + '})', 'g');
     this.lines = [];
     this.counter = 0;
   }
 
   public log(msg: string) {
+    console.info('[Application log] ', msg);
     this.add(msg, LogType.Log);
   }
 
