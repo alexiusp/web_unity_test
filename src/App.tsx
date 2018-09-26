@@ -164,9 +164,9 @@ class App extends React.Component<{}, IAppState> {
   public render() {
     const debug = Logger.print();
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">UnityLoader test</h1>
+      <div className="app">
+        <header className="app-header">
+          <h1 className="app-title">UnityLoader test</h1>
         </header>
         <div className="controls">
           <div className="controls-row">
@@ -188,9 +188,9 @@ class App extends React.Component<{}, IAppState> {
           </div>
         </div>
         <div className="progress-container">
-          <div className="progress-handle" style={{ width: (this.state.progress * 100) + '%' }} />
+          <div className="progress-bar" style={{ width: (this.state.progress * 100) + '%' }} />
         </div>
-        <div className="unity">
+        <div className="exercise">
           <canvas id={CANVAS_ID} />
         </div>
         <div className="debug">
