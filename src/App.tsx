@@ -37,7 +37,6 @@ export interface Props extends IControlsState {
 
 export interface State {
   configPath: string;
-  console: string;
   counter: number;
   progress: number;
   start: boolean;
@@ -58,7 +57,6 @@ class App extends React.Component<Props, State> {
   public startTimer: any;
   public state: State = {
     configPath: `${BUILD_PATH}/Production.json`,
-    console: '>',
     counter: 0,
     progress: 0,
     start: false,
@@ -183,25 +181,6 @@ class App extends React.Component<Props, State> {
     );
   }
 
-  /*
-  private handleConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // e.stopPropagation();
-    // e.preventDefault();
-    const lines = e.target.value.split('\n');
-    this.setState({ console: lines[lines.length - 1] });
-  }
-
-  private handleConsoleKey: React.KeyboardEventHandler<HTMLInputElement> = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.charCode !== 13) {
-      return;
-    }
-    const cmd = (`${this.state.console}`).slice(1);
-    this.setState({ console: '>' });
-    this.props.onLog(`Unknown command: ${cmd}`);
-    // e.stopPropagation();
-    // e.preventDefault();
-  }
-  */
   // sending messages to game instance
   private sendMessage: (objectName: string, methodName: string, value: any) => void = (objectName, methodName, value) => {
     if (this.instance) {

@@ -1,7 +1,7 @@
 import {
+  CONSOLE_COMMAND,
   CONSOLE_INPUT_UPDATE,
   CONSOLE_LOG,
-  CONSOLE_COMMAND,
 } from '../actions/console';
 import { IAction, IBaseAction } from '../models/actions';
 import { ILoggerMessage, LogType } from '../models/console';
