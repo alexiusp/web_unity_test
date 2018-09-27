@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import './ExerciseContainer.css';
+
 import ExerciseViewComponent from './views/ExerciseView';
 
 export interface Props {

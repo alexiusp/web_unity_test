@@ -195,7 +195,7 @@ class App extends React.Component<Props, State> {
         </div>
         <ExerciseContainer />
         <div className="exercise">
-          <div id={CANVAS_ID} />
+          <div id={CANVAS_ID} style={{ width: '960px', height: '600px'}} />
         </div>
         <ConsoleContainer />
       </div>

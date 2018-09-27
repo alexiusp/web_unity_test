@@ -1,9 +1,9 @@
 import {
   EXERCISE_CONFIG_UPDATE,
   EXERCISE_LOADING_UPDATE,
+  EXERCISE_OPTIONS_UPDATE,
   EXERCISE_SELECT,
   EXERCISE_SETTINGS_UPDATE,
-  EXERCISE_OPTIONS_UPDATE,
 } from '../actions/exercise';
 import { IAction, IBaseAction } from '../models/actions';
 import { CurrentExercise } from '../models/exercise';
