@@ -9,12 +9,10 @@ import {
 } from '../state/actions/console';
 import { Callback, DataCallback } from '../state/models/base';
 import { ILoggerMessage } from '../state/models/console';
-import { IAppState } from '../state/models/state';
-import { getConsoleInput, getConsoleLines } from '../state/selectors/console';
+import { IAppState, IConsoleState } from '../state/models/state';
+import { getConsoleInput, getConsoleLines, getConsoleProgress } from '../state/selectors/console';
 
-export interface Props {
-  input: string;
-  lines: ILoggerMessage[];
+export interface Props extends IConsoleState {
   onChange: DataCallback;
   onCommand: Callback;
 }
@@ -25,9 +23,16 @@ export function printConsole(lines: ILoggerMessage[]) {
   ));
 }
 
+const LoadingPalette = '\\|/-\\|/-';
+
+export function getLoadingChar(loading: number) {
+  const index = loading % LoadingPalette.length;
+  return LoadingPalette.charAt(index);
+}
+
 export class ConsoleContainer extends React.Component<Props, {}> {
 
-  public bottom: HTMLDivElement | null;
+  public bottom: HTMLParagraphElement | null;
 
   public componentDidMount() {
     this.scrollToBottom();
@@ -37,25 +42,28 @@ export class ConsoleContainer extends React.Component<Props, {}> {
     this.scrollToBottom();
   }
 
+  public onConsoleKey: React.KeyboardEventHandler<HTMLInputElement> = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.charCode !== 13) {
+      return;
+    }
+    this.props.onCommand();
+  }
+
+  public onConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    this.props.onChange(value);
+  }
+
   public render() {
     const consoleContent = printConsole(this.props.lines);
-    const handleConsoleKey: React.KeyboardEventHandler<HTMLInputElement> = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.charCode !== 13) {
-        return;
-      }
-      this.props.onCommand();
-    }
-    const handleConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      this.props.onChange(value);
-    }
+    const loadingChar = (this.props.progress > 0) ? getLoadingChar(this.props.progress) : '';
     return (
       <div className="debug">
         <div className="debug-console">
           {consoleContent}
-          <div ref={(el) => { this.bottom = el; }}/>
+          <p ref={(el) => { this.bottom = el; }}>{loadingChar}</p>
         </div>
-        <input className="debug-input" type="text" value={this.props.input} onKeyPress={handleConsoleKey} onChange={handleConsoleChange} />
+        <input className="debug-input" type="text" value={this.props.input} onKeyPress={this.onConsoleKey} onChange={this.onConsoleChange} />
       </div>
     );
   }
@@ -71,9 +79,11 @@ export class ConsoleContainer extends React.Component<Props, {}> {
 export const mapStateToProps = (state: IAppState) => {
   const lines = getConsoleLines(state);
   const input = getConsoleInput(state);
+  const progress = getConsoleProgress(state);
   return {
     input,
     lines,
+    progress,
   };
 }
 

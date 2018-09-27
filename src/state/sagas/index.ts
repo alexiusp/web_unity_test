@@ -7,6 +7,7 @@ import {
   controlsOptionsUpdate,
   controlsSettingsUpdate,
 } from '../actions/controls';
+import { progressWatcher } from './progress';
 
 const baseUrl = process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain';
 const configPath = '/Configs';
@@ -37,5 +38,6 @@ export function* appWatcher() {
 export default function* rootSaga() {
   yield all([
     fork(appWatcher),
+    fork(progressWatcher),
   ])
 }

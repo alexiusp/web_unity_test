@@ -3,6 +3,8 @@ import {
   CONSOLE_ERROR,
   CONSOLE_INPUT_UPDATE,
   CONSOLE_LOG,
+  CONSOLE_PROGRESS_END,
+  CONSOLE_PROGRESS_UPDATE,
 } from '../actions/console';
 import { IAction, IBaseAction } from '../models/actions';
 import { ILoggerMessage, LogType } from '../models/console';
@@ -11,10 +13,23 @@ import { IConsoleState } from '../models/state';
 export const initialState: IConsoleState = {
   input: '>',
   lines: [],
+  progress: 0,
 };
 
 export function console(state = initialState, action: IBaseAction) {
   switch (action.type) {
+    case CONSOLE_PROGRESS_UPDATE: {
+      return {
+        ...state,
+        progress: state.progress + 1,
+      }
+    }
+    case CONSOLE_PROGRESS_END: {
+      return {
+        ...state,
+        progress: 0,
+      }
+    }
     case CONSOLE_ERROR: {
       const content = (action as IAction).payload.message;
       const message: ILoggerMessage = {

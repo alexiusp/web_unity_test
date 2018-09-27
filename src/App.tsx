@@ -2,15 +2,20 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
+import './App.css';
+
+import ConsoleContainer from './console/ConsoleContainer';
 import ControlsPanel from './controls/ControlsPanel';
 import Logger from './Logger';
-import { DataCallback } from './state/models/base';
+import {
+  consoleError,
+  consoleLog,
+  consoleProgressEnd,
+  consoleProgressStart,
+} from './state/actions/console';
+import { Callback, DataCallback } from './state/models/base';
 import { IAppState, IControlsState } from './state/models/state';
 import { getControls } from './state/selectors/controls';
-
-import './App.css';
-import ConsoleContainer from './console/ConsoleContainer';
-import { consoleError, consoleLog } from './state/actions/console';
 
 const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
 const BUILD_PATH = BASE_PATH + '/Build';
@@ -34,11 +39,12 @@ interface IUnityInstance {
 export interface Props extends IControlsState {
   onLog: DataCallback;
   onError: DataCallback;
+  onStartTimer: Callback;
+  onStopTimer: Callback;
 }
 
 export interface State {
   configPath: string;
-  counter: number;
   progress: number;
   start: boolean;
 }
@@ -54,11 +60,8 @@ function getCacheBuster() {
 
 class App extends React.Component<Props, State> {
   public instance: IUnityInstance;
-  public initTimer: any;
-  public startTimer: any;
   public state: State = {
     configPath: `${BUILD_PATH}/Production.json`,
-    counter: 0,
     progress: 0,
     start: false,
   }
@@ -88,7 +91,7 @@ class App extends React.Component<Props, State> {
   }
 
   public stopTest = () => {
-    this.stopTimers();
+    this.props.onStopTimer();
     this.setState({ start: false });
     this.props.onLog('Stop!');
   }
@@ -102,14 +105,13 @@ class App extends React.Component<Props, State> {
     // unity loader script loaded - ready to load engine
     const path = this.state.configPath + '?rnd=' + getCacheBuster();
     this.instance = UnityLoader.instantiate(CANVAS_ID, path, { onProgress: this.onUnityProgress });
-    this.initTimer = setInterval(this.onTimer, 500);
+    this.props.onStartTimer();
   }
 
   // 'app ready' handler called when core app loaded
   public appReady = () => {
-    this.stopTimers();
+    this.props.onStopTimer();
     this.props.onLog('appReady called');
-    this.startTimer = setInterval(this.onTimer, 500);
     if (this.props.auto) {
       this.loadApp();
     }
@@ -117,7 +119,7 @@ class App extends React.Component<Props, State> {
 
   // 'engine ready' handler called when engine finished loading
   public engineReady = () => {
-    this.stopTimers();
+    this.props.onStopTimer();
     this.props.onLog('engineReady called');
     if (this.props.auto) {
       this.loadExercise();
@@ -126,7 +128,7 @@ class App extends React.Component<Props, State> {
 
   // 'assets loaded' handler called when exercise assets were loaded
   public exerciseReady = () => {
-    this.stopTimers();
+    this.props.onStopTimer();
     this.props.onLog('exerciseReady called');
     if (this.props.auto) {
       this.startExercise();
@@ -135,10 +137,12 @@ class App extends React.Component<Props, State> {
 
   public loadApp = () => {
     this.appInit(this.props.config);
+    this.props.onStartTimer();
   }
 
   public loadExercise = () => {
     this.exerciseInit(this.props.settings);
+    this.props.onStartTimer();
   }
 
   public startExercise = () => {
@@ -150,7 +154,7 @@ class App extends React.Component<Props, State> {
   }
 
   public onError = (e: Error) => {
-    this.stopTimers();
+    this.props.onStopTimer();
     this.props.onError(`Error: ${e.message}`);
   }
 
@@ -198,18 +202,6 @@ class App extends React.Component<Props, State> {
   private exerciseInit = (settings: any) => this.sendMessage('Main', 'InitializeExercise', settings);
   private exerciseStart = (options: any) => this.sendMessage('Main', 'StartExercise', options);
 
-  private onTimer = () => {
-    this.setState({ counter: this.state.counter + 1 });
-    Logger.progress();
-  }
-
-  private stopTimers = () => {
-    this.setState({ counter: 0 });
-    clearInterval(this.startTimer);
-    clearInterval(this.initTimer);
-    Logger.stop();
-  }
-
 }
 
 export const mapStateToProps = (state: IAppState) => {
@@ -232,6 +224,12 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     onError: (msg: string) => {
       Logger.log(msg);
       dispatch(consoleError(msg));
+    },
+    onStartTimer: () => {
+      dispatch(consoleProgressStart());
+    },
+    onStopTimer: () => {
+      dispatch(consoleProgressEnd());
     },
   }
 }

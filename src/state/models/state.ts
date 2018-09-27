@@ -11,6 +11,7 @@ export interface IControlsState {
 export interface IConsoleState {
   lines: ILoggerMessage[];
   input: string;
+  progress: number;
 }
 
 export interface IAppState {
