@@ -6,14 +6,13 @@ import './App.css';
 
 import ConsoleContainer from './console/ConsoleContainer';
 import ControlsPanel from './controls/ControlsPanel';
-import Logger from './Logger';
 import {
   consoleError,
   consoleLog,
   consoleProgressEnd,
   consoleProgressStart,
 } from './state/actions/console';
-import { Callback, DataCallback } from './state/models/base';
+import { Callback, DataCallback, IUnityInstance } from './state/models/base';
 import { IAppState, IControlsState } from './state/models/state';
 import { getControls } from './state/selectors/controls';
 
@@ -30,11 +29,6 @@ declare var window: {
   completeExercise: (result: any) => void,
   exerciseFailed: (e: Error) => void,
 };
-
-interface IUnityInstance {
-  SendMessage: (objectName: string, methodName: string, value: string) => void,
-};
-
 
 export interface Props extends IControlsState {
   onLog: DataCallback;
@@ -81,8 +75,13 @@ class App extends React.Component<Props, State> {
 
   public startTest = () => {
     this.setState({ start: true });
+    const existingScript = document.getElementById('unity-loader');
+    if (existingScript) {
+      existingScript.parentNode!.removeChild(existingScript);
+    }
     const script = document.createElement('script');
     const loaderPath = BUILD_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
+    script.id = 'unity-loader';
     script.src = loaderPath;
     script.onload = this.onUnityInitialize;
     script.async = true;
@@ -218,11 +217,9 @@ export const mapStateToProps = (state: IAppState) => {
 export const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     onLog: (msg: string) => {
-      Logger.log(msg);
       dispatch(consoleLog(msg));
     },
     onError: (msg: string) => {
-      Logger.log(msg);
       dispatch(consoleError(msg));
     },
     onStartTimer: () => {
