@@ -13,16 +13,18 @@ import {
   consoleProgressEnd,
   consoleProgressStart,
 } from './state/actions/console';
+import { unityInit } from './state/actions/unity';
 import { Callback, DataCallback, IUnityInstance } from './state/models/base';
 import { IAppState, IControlsState } from './state/models/state';
 import { getControls } from './state/selectors/controls';
 
 const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
 const BUILD_PATH = BASE_PATH + '/Build';
-const LOADER_NAME = 'UnityLoader';
+// const LOADER_NAME = 'UnityLoader';
 const CANVAS_ID = 'exercise';
 
 declare var UnityLoader: any;
+/*
 declare var window: {
   appReady: () => void,
   engineReady: () => void,
@@ -30,12 +32,13 @@ declare var window: {
   completeExercise: (result: any) => void,
   exerciseFailed: (e: Error) => void,
 };
-
+*/
 export interface Props extends IControlsState {
   onLog: DataCallback;
   onError: DataCallback;
   onStartTimer: Callback;
   onStopTimer: Callback;
+  onStart: Callback;
 }
 
 export interface State {
@@ -63,6 +66,7 @@ class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+    /*
     // app started handler
     window.appReady = this.appReady;
     // 'engine ready' handler
@@ -72,10 +76,12 @@ class App extends React.Component<Props, State> {
     // exercise callbacks
     window.completeExercise = this.completeExercise;
     window.exerciseFailed = this.onError;
+    */
   }
 
   public startTest = () => {
     this.setState({ start: true });
+    /*
     const existingScript = document.getElementById('unity-loader');
     if (existingScript) {
       existingScript.parentNode!.removeChild(existingScript);
@@ -88,6 +94,8 @@ class App extends React.Component<Props, State> {
     script.async = true;
     document.body.appendChild(script);
     this.props.onLog('Test started!');
+    */
+   this.props.onStart();
   }
 
   public stopTest = () => {
@@ -230,6 +238,9 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     onStopTimer: () => {
       dispatch(consoleProgressEnd());
     },
+    onStart: () => {
+      dispatch(unityInit());
+    }
   }
 }
 
