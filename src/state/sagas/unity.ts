@@ -15,7 +15,6 @@ import {
   UNITY_INIT,
   UNITY_LOADER_START,
   UNITY_STOP,
-  unityAppInit,
   unityAppReady,
   unityEngineReady,
   unityExerciseComplete,
@@ -87,10 +86,6 @@ export function* unityLoaderStartSaga(dispatch: Dispatch) {
 export function* appReadySaga() {
   yield put(consoleProgressEnd());
   yield put(consoleLog('appReady called'));
-  const isAuto = yield select(getAutoValue);
-  if (isAuto) {
-    yield put(unityAppInit());
-  }
 }
 
 export function* appInitSaga() {
@@ -102,10 +97,6 @@ export function* appInitSaga() {
 export function* engineReadySaga() {
   yield put(consoleProgressEnd());
   yield put(consoleLog('engineReady called'));
-  const isAuto = yield select(getAutoValue);
-  if (isAuto) {
-    yield put(unityExerciseInit());
-  }
 }
 
 export function* appEngineSaga() {
@@ -157,6 +148,7 @@ export function* sendMessage(objectName: string, methodName: string, value: any)
 }
 
 export function* unityWatcher(dispatch: Dispatch) {
+  let isAuto: boolean;
   // wait for init action
   yield take(UNITY_INIT);
   // inject UnityLoader
@@ -167,14 +159,25 @@ export function* unityWatcher(dispatch: Dispatch) {
   yield call(unityLoaderStartSaga, dispatch);
   // wait for appReady callback
   yield take(UNITY_APP_READY);
-  yield call(appReadySaga);
-  // wait for auto/user call for InitializeApp
-  yield take(UNITY_APP_INIT);
-  yield call(appInitSaga);
+  yield put(consoleLog('111'));
+  yield fork(appReadySaga);
+  isAuto = yield select(getAutoValue);
+  if (!isAuto) {
+    yield put(consoleLog('222'));
+    // wait for user call for InitializeApp
+    yield take(UNITY_APP_INIT);
+  }
+  yield put(consoleLog('333'));
+  yield fork(appInitSaga);
+  yield put(consoleLog('444'));
   // wait for engineReady
   yield take(UNITY_ENGINE_READY);
+  yield put(consoleLog('555'));
   yield call(engineReadySaga);
-  let exerciseTask;
+  yield put(consoleLog('666'));
+  isAuto = yield select(getAutoValue);
+  let exerciseTask = isAuto ? yield fork(appEngineSaga) : null;
+  yield put(consoleLog('777'));
   // start cycle for running exercises
   while (true) {
     const action: IBaseAction = yield take([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED]);

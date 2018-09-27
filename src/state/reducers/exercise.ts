@@ -2,6 +2,8 @@ import {
   EXERCISE_CONFIG_UPDATE,
   EXERCISE_LOADING_UPDATE,
   EXERCISE_SELECT,
+  EXERCISE_SETTINGS_UPDATE,
+  EXERCISE_OPTIONS_UPDATE,
 } from '../actions/exercise';
 import { IAction, IBaseAction } from '../models/actions';
 import { CurrentExercise } from '../models/exercise';
@@ -28,7 +30,7 @@ export function exercise(state = initialState, action: IBaseAction) {
       return {
         ...state,
         current: {
-          ...initialCurrentState,
+          ...state.current,
           progress,
         },
       }
@@ -46,6 +48,26 @@ export function exercise(state = initialState, action: IBaseAction) {
         current: {
           ...initialCurrentState,
           name,
+        },
+      }
+    }
+    case EXERCISE_SETTINGS_UPDATE: {
+      const settings = (action as IAction).payload.settings;
+      return {
+        ...state,
+        current: {
+          ...state.current,
+          settings,
+        },
+      }
+    }
+    case EXERCISE_OPTIONS_UPDATE: {
+      const options = (action as IAction).payload.options;
+      return {
+        ...state,
+        current: {
+          ...state.current,
+          options,
         },
       }
     }
