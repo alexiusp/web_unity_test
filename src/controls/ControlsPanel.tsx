@@ -2,6 +2,8 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
+import './ControlsPanel.css';
+
 import { controlsAutoUpdate, controlsConfigUpdate, controlsOptionsUpdate, controlsSettingsUpdate } from '../state/actions/controls';
 import { Callback, DataCallback } from '../state/models/base';
 import { IAppState, IControlsState } from '../state/models/state';

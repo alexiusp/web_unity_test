@@ -11,13 +11,6 @@
       font-size: 1.2em;
     }
   }
-  // controls panel
-  .controls {
-    padding: 10px;
-    .controls-row {
-      padding: 2px 0;
-    }
-  }
   // progress indicator
   .progress-container {
     width: 640px;
@@ -37,39 +30,5 @@
     display: block;
     border: 1px solid #aaa;
     margin: 0 auto;
-  }
-  // debug console container
-  .debug {
-    margin: 10px auto;
-    width: 40rem;
-    height: 18rem;
-    background: #222;
-    .debug-console {
-      background: #222;
-      min-height: 0;
-      max-height: 16rem;
-      overflow-x: hidden;
-      overflow-y: auto;
-      p {
-        color: #00FF00;
-        font-family: 'Courier New', Courier, monospace;
-        white-space: pre-wrap;
-        text-align: left;
-        margin: 0;
-      }
-    }
-    .debug-input {
-      background: #222;
-      color: #00FF00;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1rem;
-      text-align: left;
-      margin: 0;
-      padding: 0;
-      height: 2rem;
-      border: 0;
-      width: 100%;
-      outline: 0;
-    }
   }
 }
