@@ -1,6 +1,7 @@
 export interface CurrentExercise {
   name: string;
   options: string;
+  progress: number;
   settings: string;
 };
 

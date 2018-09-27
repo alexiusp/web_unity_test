@@ -9,11 +9,11 @@ import rootSaga from './sagas';
 export type AppStore = Store<IAppState, Action>;
 
 export default function getStore(): AppStore {
-  const sagaMiddleware = createSagaMiddleware();
-  const store = createStore(
+  const rootSagaMiddleware = createSagaMiddleware();
+  const store: AppStore = createStore(
     reducer,
-    composeWithDevTools(applyMiddleware(sagaMiddleware))
+    composeWithDevTools(applyMiddleware(rootSagaMiddleware))
   );
-  sagaMiddleware.run(rootSaga);
+  rootSagaMiddleware.run(rootSaga, store.dispatch);
   return store;
 }

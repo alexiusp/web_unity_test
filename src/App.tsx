@@ -6,6 +6,7 @@ import './App.css';
 
 import ConsoleContainer from './console/ConsoleContainer';
 import ControlsPanel from './controls/ControlsPanel';
+import { ExerciseContainer } from './exercise/ExerciseContainer';
 import {
   consoleError,
   consoleLog,
@@ -177,6 +178,7 @@ class App extends React.Component<Props, State> {
         <div className="progress-container">
           <div className="progress-bar" style={{ width: (this.state.progress * 100) + '%' }} />
         </div>
+        <ExerciseContainer />
         <div className="exercise">
           <div id={CANVAS_ID} />
         </div>

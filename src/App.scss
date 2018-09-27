@@ -11,24 +11,4 @@
       font-size: 1.2em;
     }
   }
-  // progress indicator
-  .progress-container {
-    width: 640px;
-    margin: 0 auto;
-    height: 0.5rem;
-    border: 1px solid #aaa;
-    .progress-bar {
-      width: 0;
-      height: 100%;
-      background: #00AA00;
-    }
-  }
-  // exercise container
-  .exercise {
-    width: 640px;
-    height: 320px;
-    display: block;
-    border: 1px solid #aaa;
-    margin: 0 auto;
-  }
 }

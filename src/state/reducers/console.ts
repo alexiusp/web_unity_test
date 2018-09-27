@@ -32,6 +32,7 @@ export function console(state = initialState, action: IBaseAction) {
     }
     case CONSOLE_ERROR: {
       const content = (action as IAction).payload.message;
+      window.console.warn('ERROR: ', content);
       const message: ILoggerMessage = {
         type: LogType.Error,
         message: content,
@@ -43,6 +44,7 @@ export function console(state = initialState, action: IBaseAction) {
     }
     case CONSOLE_LOG: {
       const content = (action as IAction).payload.message;
+      window.console.log('LOG: ', content);
       const message: ILoggerMessage = {
         type: LogType.Log,
         message: content,
