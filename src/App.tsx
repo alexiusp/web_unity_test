@@ -12,6 +12,7 @@ import {
   consoleProgressEnd,
   consoleProgressStart,
 } from './state/actions/console';
+import { exerciseSelect } from './state/actions/exercise';
 import { Callback, DataCallback, IUnityInstance } from './state/models/base';
 import { IAppState, IControlsState } from './state/models/state';
 import { getControls } from './state/selectors/controls';
@@ -26,15 +27,16 @@ declare var window: {
   appReady: () => void,
   engineReady: () => void,
   exerciseReady: () => void,
-  completeExercise: (result: any) => void,
+  completeExercise: (result: string) => void,
   exerciseFailed: (e: Error) => void,
 };
 
 export interface Props extends IControlsState {
-  onLog: DataCallback;
-  onError: DataCallback;
+  onLog: DataCallback<string>;
+  onError: DataCallback<string>;
   onStartTimer: Callback;
   onStopTimer: Callback;
+  onNext: DataCallback<string>;
 }
 
 export interface State {
@@ -148,8 +150,13 @@ class App extends React.Component<Props, State> {
     this.exerciseStart(this.props.options);
   }
 
-  public completeExercise = (result: any) => {
-    this.props.onLog(`completeExercise: ${JSON.stringify(result)}`);
+  public completeExercise = (resultString: string) => {
+    this.props.onLog(`completeExercise: ${resultString}`);
+    const result = JSON.parse(resultString);
+    if (result && result.name) {
+      const next = result.name;
+      this.props.onNext(next);
+    }
   }
 
   public onError = (e: Error) => {
@@ -227,6 +234,9 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     },
     onStopTimer: () => {
       dispatch(consoleProgressEnd());
+    },
+    onNext: (name: string) => {
+      dispatch(exerciseSelect(name));
     },
   }
 }
