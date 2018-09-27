@@ -2,30 +2,23 @@ import axios from 'axios';
 import { all, fork, put, takeEvery } from 'redux-saga/effects';
 
 import { APP_START } from '../actions';
-import {
-  controlsConfigUpdate,
-  controlsOptionsUpdate,
-  controlsSettingsUpdate,
-} from '../actions/controls';
+import { controlsConfigUpdate } from '../actions/controls';
+import { exerciseConfigUpdate, exerciseSelect } from '../actions/exercise';
+import { exerciseWatcher } from './exercise';
 import { progressWatcher } from './progress';
 
 const baseUrl = process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain';
 const configPath = '/Configs';
-const exercisePath = '/Memoflow';
+const startExercise = 'Memoflow';
 
 export function* startAppSaga() {
   const appConfigResponse = yield axios.get(`${baseUrl}${configPath}/AppConfig.json`);
   if (appConfigResponse.status === 200) {
-    yield put(controlsConfigUpdate(appConfigResponse.data));
+    const config = JSON.stringify(appConfigResponse.data);
+    yield put(controlsConfigUpdate(config));
+    yield put(exerciseConfigUpdate(config));
   }
-  const appSettingsResponse = yield axios.get(`${baseUrl}${configPath}${exercisePath}/Settings.json`);
-  if (appSettingsResponse.status === 200) {
-    yield put(controlsSettingsUpdate(appSettingsResponse.data));
-  }
-  const appOptionsResponse = yield axios.get(`${baseUrl}${configPath}${exercisePath}/Options.json`);
-  if (appOptionsResponse.status === 200) {
-    yield put(controlsOptionsUpdate(appOptionsResponse.data));
-  }
+  yield put(exerciseSelect(startExercise));
 }
 
 export function* appWatcher() {
@@ -39,5 +32,6 @@ export default function* rootSaga() {
   yield all([
     fork(appWatcher),
     fork(progressWatcher),
+    fork(exerciseWatcher),
   ])
 }
