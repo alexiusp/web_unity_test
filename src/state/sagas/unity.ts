@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { all, call, cancel, fork, put, select, take, takeEvery } from 'redux-saga/effects';
+import { all, call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 
 import { BASE_PATH, CANVAS_ID } from '../../constants';
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
@@ -16,16 +16,18 @@ import {
   UNITY_INIT,
   UNITY_LOADER_START,
   UNITY_STOP,
+  unityAppInit,
   unityAppReady,
   unityEngineReady,
   unityExerciseComplete,
   unityExerciseFailed,
+  unityExerciseInit,
   unityExerciseReady,
   unityExerciseRunning,
   unityLoaderStart,
   unityStop,
 } from '../actions/unity';
-import { IAction, IBaseAction } from '../models/actions';
+import { IAction } from '../models/actions';
 import { IUnityInstance } from '../models/base';
 import { getAutoValue } from '../selectors/controls';
 import { getAppConfig, getExerciseOptions, getExerciseSettings } from '../selectors/exercise';
@@ -54,7 +56,13 @@ function getCacheBuster() {
   return text;
 }
 
+let startTime: number;
+const timerName = 'timer';
+
 export function unityInitSaga(dispatch: Dispatch) {
+  startTime = Date.now();
+  console.log(`${timerName} started at ${startTime}`);
+  console.time(timerName);
   // app started handler
   window.appReady = () => dispatch(unityAppReady());
   // 'engine ready' handler
@@ -76,30 +84,58 @@ export function unityInitSaga(dispatch: Dispatch) {
 export function* unityLoaderStartSaga(dispatch: Dispatch) {
   yield put(consoleLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
-  const path = appConfigPath + '?rnd=' + getCacheBuster();
+  // const path = appConfigPath + '?rnd=' + getCacheBuster();
   const onProgress = (inst: IUnityInstance, progress: number) => dispatch(exerciseLoadingUpdate(progress));
-  instance = UnityLoader.instantiate(CANVAS_ID, path, { onProgress });
+  instance = UnityLoader.instantiate(CANVAS_ID, appConfigPath, { onProgress });
   yield put(consoleProgressStart());
+}
+
+export function* unityInitTransitionSaga(dispatch: Dispatch) {
+  // inject UnityLoader
+  yield fork(unityInitSaga, dispatch);
+  // wait for onLoad callback
+  yield take(UNITY_LOADER_START);
+  // instantiate app
+  yield fork(unityLoaderStartSaga, dispatch);
 }
 
 // 'app ready' handler called when core app loaded
 export function* appReadySaga() {
   yield put(consoleLog('appReady called'));
   yield put(consoleProgressEnd());
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(unityAppInit());
+  }
 }
 
 export function* appInitSaga() {
-  const config = yield select(getAppConfig);
-  yield call(sendMessage, 'Main', 'InitializeApp', config);
+  const configStr = yield select(getAppConfig);
+  const config = JSON.parse(configStr);
+  config.startedAt = startTime;
+  console.log(`${timerName} finished at ${Date.now()}`);
+  console.timeEnd(timerName);
+  yield call(sendMessage, 'Main', 'InitializeApp', JSON.stringify(config));
   yield put(consoleProgressStart());
 }
 
-export function* engineReadySaga() {
+export function* unityEngineStartupSaga() {
+  yield fork(appInitSaga);
+  // wait for engineReady
+  yield take(UNITY_ENGINE_READY);
   yield put(consoleLog('engineReady called'));
   yield put(consoleProgressEnd());
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(unityExerciseInit());
+  }
 }
 
-export function* appEngineSaga() {
+export function* appEngineSaga(action: IAction) {
+  if (action.type !== UNITY_EXERCISE_INIT) {
+    yield put(consoleLog('exercise workflow finished'));
+    return;
+  }
   try {
     let autoRun = true;
     while (autoRun) {
@@ -146,44 +182,17 @@ export function* sendMessage(objectName: string, methodName: string, value: any)
   }
 }
 
-export function* unityFlowSaga(dispatch: Dispatch) {
-  let isAuto: boolean;
-  // inject UnityLoader
-  yield call(unityInitSaga, dispatch);
-  // wait for onLoad callback
-  yield take(UNITY_LOADER_START);
-  // instantiate app
-  yield call(unityLoaderStartSaga, dispatch);
+export function* unityFlowStartSaga(dispatch: Dispatch) {
+  yield fork(unityInitTransitionSaga, dispatch);
   // wait for appReady callback
   yield take(UNITY_APP_READY);
   yield fork(appReadySaga);
-  isAuto = yield select(getAutoValue);
-  if (!isAuto) {
-    // wait for user call for InitializeApp
-    yield take(UNITY_APP_INIT);
-  }
-  yield fork(appInitSaga);
-  // wait for engineReady
-  yield take(UNITY_ENGINE_READY);
-  yield call(engineReadySaga);
-  isAuto = yield select(getAutoValue);
-  let exerciseTask = isAuto ? yield fork(appEngineSaga) : null;
-  // start cycle for running exercises
-  while (true) {
-    const action: IBaseAction = yield take([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED]);
-    yield put(consoleProgressEnd());
-    if (exerciseTask) {
-      // if task is already running - cancel it
-      yield cancel(exerciseTask);
-    }
-    if (action.type === UNITY_EXERCISE_INIT) {
-      exerciseTask = yield fork(appEngineSaga);
-    }
-  }
 }
 
 export function* unityWatcher(dispatch: Dispatch) {
   yield all([
-    takeEvery(UNITY_INIT, unityFlowSaga, dispatch),
+    takeLatest(UNITY_INIT, unityFlowStartSaga, dispatch),
+    takeLatest(UNITY_APP_INIT, unityEngineStartupSaga),
+    takeLatest([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], appEngineSaga),
   ]);
 }
