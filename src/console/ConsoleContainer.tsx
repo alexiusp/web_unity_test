@@ -53,7 +53,7 @@ export class ConsoleContainer extends React.Component<Props, {}> {
 
   public onConsoleChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    this.props.onChange(value);
+    this.props.onChange(value || '>');
   }
 
   public render() {
