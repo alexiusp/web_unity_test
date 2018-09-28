@@ -7,11 +7,13 @@
     .col {
       flex-grow: 1;
       padding: 0.5rem;
+      border-bottom: 4px solid transparent;
+      transition: border 300ms ease-out;
       &.pull-right {
         margin-left: auto;
       }
       &.completed {
-        background-color: darkolivegreen;
+        border-bottom: 4px solid darkolivegreen;
       }
     }
   }
