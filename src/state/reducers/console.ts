@@ -1,3 +1,4 @@
+import { takeRight } from 'lodash';
 import {
   CONSOLE_COMMAND,
   CONSOLE_ERROR,
@@ -16,12 +17,14 @@ export const initialState: IConsoleState = {
   progress: 0,
 };
 
+export const consoleLimit = 100;
+
 export function console(state = initialState, action: IBaseAction) {
   switch (action.type) {
     case CONSOLE_PROGRESS_UPDATE: {
       return {
         ...state,
-        progress: state.progress + 1,
+        progress: (state.progress + 1) % Number.MAX_SAFE_INTEGER,
       }
     }
     case CONSOLE_PROGRESS_END: {
@@ -32,24 +35,28 @@ export function console(state = initialState, action: IBaseAction) {
     }
     case CONSOLE_ERROR: {
       const content = (action as IAction).payload.message;
+      window.console.warn('ERROR: ', content);
       const message: ILoggerMessage = {
         type: LogType.Error,
         message: content,
       };
+      const lines = takeRight([...state.lines, message], consoleLimit);
       return {
         ...state,
-        lines: [...state.lines, message],
+        lines,
       }
     }
     case CONSOLE_LOG: {
       const content = (action as IAction).payload.message;
+      window.console.log('LOG: ', content);
       const message: ILoggerMessage = {
         type: LogType.Log,
         message: content,
       };
+      const lines = takeRight([...state.lines, message], consoleLimit);
       return {
         ...state,
-        lines: [...state.lines, message],
+        lines,
       }
     }
     case CONSOLE_INPUT_UPDATE: {
@@ -65,10 +72,11 @@ export function console(state = initialState, action: IBaseAction) {
         type: LogType.Error,
         message: `Unknown command: ${cmd}`,
       };
+      const lines = takeRight([...state.lines, message], consoleLimit);
       return {
         ...state,
         input: '>',
-        lines: [...state.lines, message],
+        lines,
       }
     }
   }

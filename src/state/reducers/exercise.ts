@@ -1,4 +1,10 @@
-import { EXERCISE_CONFIG_UPDATE, EXERCISE_SELECT } from '../actions/exercise';
+import {
+  EXERCISE_CONFIG_UPDATE,
+  EXERCISE_LOADING_UPDATE,
+  EXERCISE_OPTIONS_UPDATE,
+  EXERCISE_SELECT,
+  EXERCISE_SETTINGS_UPDATE,
+} from '../actions/exercise';
 import { IAction, IBaseAction } from '../models/actions';
 import { CurrentExercise } from '../models/exercise';
 import { IExerciseState } from '../models/state';
@@ -6,6 +12,7 @@ import { IExerciseState } from '../models/state';
 export const initialCurrentState: CurrentExercise = {
   name: '',
   options: '',
+  progress: 0,
   settings: '',
 };
 
@@ -18,6 +25,16 @@ export const initialState: IExerciseState = {
 
 export function exercise(state = initialState, action: IBaseAction) {
   switch (action.type) {
+    case EXERCISE_LOADING_UPDATE: {
+      const progress = (action as IAction).payload.progress;
+      return {
+        ...state,
+        current: {
+          ...state.current,
+          progress,
+        },
+      }
+    }
     case EXERCISE_CONFIG_UPDATE: {
       return {
         ...state,
@@ -31,6 +48,26 @@ export function exercise(state = initialState, action: IBaseAction) {
         current: {
           ...initialCurrentState,
           name,
+        },
+      }
+    }
+    case EXERCISE_SETTINGS_UPDATE: {
+      const settings = (action as IAction).payload.settings;
+      return {
+        ...state,
+        current: {
+          ...state.current,
+          settings,
+        },
+      }
+    }
+    case EXERCISE_OPTIONS_UPDATE: {
+      const options = (action as IAction).payload.options;
+      return {
+        ...state,
+        current: {
+          ...state.current,
+          options,
         },
       }
     }

@@ -14,3 +14,10 @@ export const exerciseOptionsUpdate = actionBuilder<{ options: string }>(EXERCISE
 // updates settings value from ajax or input
 export const EXERCISE_SETTINGS_UPDATE = 'EXERCISE_SETTINGS_UPDATE';
 export const exerciseSettingsUpdate = actionBuilder<{ settings: string }>(EXERCISE_SETTINGS_UPDATE, 'settings');
+
+// updates progress value from UnityLoader
+export const EXERCISE_LOADING_UPDATE = 'EXERCISE_LOADING_UPDATE';
+export const exerciseLoadingUpdate = actionBuilder<{ progress: number }>(EXERCISE_LOADING_UPDATE, 'progress');
+
+export const EXERCISE_READY = 'EXERCISE_READY';
+export const exerciseReady = actionBuilder(EXERCISE_READY);

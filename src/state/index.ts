@@ -10,15 +10,15 @@ import rootSaga from './sagas';
 export type AppStore = Store<IAppState, Action>;
 
 export default function getStore(): AppStore {
-  const sagaMiddleware = createSagaMiddleware();
+  const rootSagaMiddleware = createSagaMiddleware();
   const composeEnhancers = composeWithDevTools({
     maxAge: 1000,
     actionsBlacklist: [CONSOLE_PROGRESS_UPDATE],
   });
-  const store = createStore(
+  const store: AppStore = createStore(
     reducer,
-    composeEnhancers(applyMiddleware(sagaMiddleware))
+    composeEnhancers(applyMiddleware(rootSagaMiddleware))
   );
-  sagaMiddleware.run(rootSaga);
+  rootSagaMiddleware.run(rootSaga, store.dispatch);
   return store;
 }
