@@ -4,7 +4,15 @@ import { Dispatch } from 'redux';
 
 import './ControlsPanel.css';
 
+import { consoleLog } from '../state/actions/console';
 import { controlsAutoUpdate, controlsConfigUpdate, controlsOptionsUpdate, controlsSettingsUpdate } from '../state/actions/controls';
+import {
+  unityAppInit,
+  unityExerciseInit,
+  unityExerciseStart,
+  unityInit,
+  unityStop,
+} from '../state/actions/unity';
 import { Callback, DataCallback } from '../state/models/base';
 import { IAppState, IControlsState } from '../state/models/state';
 import { getControls } from '../state/selectors/controls';
@@ -78,23 +86,22 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     onSettingsChange: (value: string) => {
       dispatch(controlsSettingsUpdate(value));
     },
-    /*
     onStart: () => {
-      // dispatch(controlsAutoUpdate());
+      dispatch(unityInit());
     },
     onStop: () => {
-      // dispatch(controlsAutoUpdate());
+      dispatch(consoleLog('Stop!'));
+      dispatch(unityStop());
     },
     onInitializeApp: () => {
-      // dispatch(controlsAutoUpdate());
+      dispatch(unityAppInit());
     },
     onInitializeExercise: () => {
-      // dispatch(controlsAutoUpdate());
+      dispatch(unityExerciseInit());
     },
     onStartExercise: () => {
-      // dispatch(controlsAutoUpdate());
+      dispatch(unityExerciseStart());
     },
-    */
   }
 }
 

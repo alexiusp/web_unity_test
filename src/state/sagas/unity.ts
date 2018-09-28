@@ -84,8 +84,8 @@ export function* unityLoaderStartSaga(dispatch: Dispatch) {
 
 // 'app ready' handler called when core app loaded
 export function* appReadySaga() {
-  yield put(consoleProgressEnd());
   yield put(consoleLog('appReady called'));
+  yield put(consoleProgressEnd());
 }
 
 export function* appInitSaga() {
@@ -95,8 +95,8 @@ export function* appInitSaga() {
 }
 
 export function* engineReadySaga() {
-  yield put(consoleProgressEnd());
   yield put(consoleLog('engineReady called'));
+  yield put(consoleProgressEnd());
 }
 
 export function* appEngineSaga() {
@@ -159,28 +159,22 @@ export function* unityWatcher(dispatch: Dispatch) {
   yield call(unityLoaderStartSaga, dispatch);
   // wait for appReady callback
   yield take(UNITY_APP_READY);
-  yield put(consoleLog('111'));
   yield fork(appReadySaga);
   isAuto = yield select(getAutoValue);
   if (!isAuto) {
-    yield put(consoleLog('222'));
     // wait for user call for InitializeApp
     yield take(UNITY_APP_INIT);
   }
-  yield put(consoleLog('333'));
   yield fork(appInitSaga);
-  yield put(consoleLog('444'));
   // wait for engineReady
   yield take(UNITY_ENGINE_READY);
-  yield put(consoleLog('555'));
   yield call(engineReadySaga);
-  yield put(consoleLog('666'));
   isAuto = yield select(getAutoValue);
   let exerciseTask = isAuto ? yield fork(appEngineSaga) : null;
-  yield put(consoleLog('777'));
   // start cycle for running exercises
   while (true) {
     const action: IBaseAction = yield take([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED]);
+    yield put(consoleProgressEnd());
     if (exerciseTask) {
       // if task is already running - cancel it
       yield cancel(exerciseTask);

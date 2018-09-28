@@ -2,16 +2,16 @@ import * as React from 'react';
 
 import './ExerciseContainer.css';
 
-import ExerciseViewComponent from './views/ExerciseView';
+import ExerciseView from './views/ExerciseView';
 
 export interface Props {
   some?: any;
 };
 
-export function ExerciseContainer(props: Props) {
+export default function ExerciseContainer(props: Props) {
   return (
     <div>
-      <ExerciseViewComponent />
+      <ExerciseView />
     </div>
   );
 }
