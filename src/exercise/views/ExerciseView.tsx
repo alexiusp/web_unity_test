@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const CANVAS_ID = 'exercise';
+import { CANVAS_ID } from '../../constants';
 
 export default function ExerciseView() {
   return (

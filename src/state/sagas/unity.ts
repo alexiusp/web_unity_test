@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
-import { call, cancel, fork, put, select, take } from 'redux-saga/effects';
+import { all, call, cancel, fork, put, select, take, takeEvery } from 'redux-saga/effects';
 
+import { BASE_PATH, CANVAS_ID } from '../../constants';
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
 import { EXERCISE_READY, exerciseLoadingUpdate, exerciseSelect } from '../actions/exercise';
 import {
@@ -29,11 +30,10 @@ import { IUnityInstance } from '../models/base';
 import { getAutoValue } from '../selectors/controls';
 import { getAppConfig, getExerciseOptions, getExerciseSettings } from '../selectors/exercise';
 
-const BASE_PATH = (process.env.REACT_APP_UNITY_PATH || 'https://nncms.s3-eu-central-1.amazonaws.com/assets/edison/exercises/brain');
-const BUILD_PATH = BASE_PATH + '/Build';
+const BUILD_PATH = `${BASE_PATH}/Build`;
 const LOADER_NAME = 'UnityLoader';
-const configPath = `${BUILD_PATH}/Production.json`;
-const CANVAS_ID = 'exercise';
+const appConfigPath = `${BUILD_PATH}/Production.json`;
+
 let instance: IUnityInstance;
 
 declare var UnityLoader: any;
@@ -64,7 +64,7 @@ export function unityInitSaga(dispatch: Dispatch) {
   // exercise completed callback
   window.completeExercise = (result: string) => dispatch(unityExerciseComplete(result));
   // error handler
-  window.exerciseFailed = () => dispatch(unityExerciseFailed());
+  window.exerciseFailed = (e: Error) => dispatch(unityExerciseFailed(e.message));
   const script = document.createElement('script');
   const loaderPath = BUILD_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
   script.src = loaderPath;
@@ -76,7 +76,7 @@ export function unityInitSaga(dispatch: Dispatch) {
 export function* unityLoaderStartSaga(dispatch: Dispatch) {
   yield put(consoleLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
-  const path = configPath + '?rnd=' + getCacheBuster();
+  const path = appConfigPath + '?rnd=' + getCacheBuster();
   const onProgress = (inst: IUnityInstance, progress: number) => dispatch(exerciseLoadingUpdate(progress));
   instance = UnityLoader.instantiate(CANVAS_ID, path, { onProgress });
   yield put(consoleProgressStart());
@@ -146,10 +146,8 @@ export function* sendMessage(objectName: string, methodName: string, value: any)
   }
 }
 
-export function* unityWatcher(dispatch: Dispatch) {
+export function* unityFlowSaga(dispatch: Dispatch) {
   let isAuto: boolean;
-  // wait for init action
-  yield take(UNITY_INIT);
   // inject UnityLoader
   yield call(unityInitSaga, dispatch);
   // wait for onLoad callback
@@ -182,4 +180,10 @@ export function* unityWatcher(dispatch: Dispatch) {
       exerciseTask = yield fork(appEngineSaga);
     }
   }
+}
+
+export function* unityWatcher(dispatch: Dispatch) {
+  yield all([
+    takeEvery(UNITY_INIT, unityFlowSaga, dispatch),
+  ]);
 }

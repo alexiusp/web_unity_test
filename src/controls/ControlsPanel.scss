@@ -17,7 +17,15 @@
       }
     }
   }
-  textarea {
-    width: 100%;
+  .edit-form {
+    height: 0;
+    transition: height 200ms ease-out;
+    overflow: hidden;
+    &.show {
+      height: 120px;
+    }
+    textarea {
+      width: 100%;
+    }
   }
 }

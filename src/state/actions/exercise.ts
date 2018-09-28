@@ -19,5 +19,26 @@ export const exerciseSettingsUpdate = actionBuilder<{ settings: string }>(EXERCI
 export const EXERCISE_LOADING_UPDATE = 'EXERCISE_LOADING_UPDATE';
 export const exerciseLoadingUpdate = actionBuilder<{ progress: number }>(EXERCISE_LOADING_UPDATE, 'progress');
 
+// custom action when exercise was loaded and ready to be started
 export const EXERCISE_READY = 'EXERCISE_READY';
 export const exerciseReady = actionBuilder(EXERCISE_READY);
+
+// 'start unity' button handling
+export const EXERCISE_UNITY_START = 'EXERCISE_UNITY_START';
+export const exerciseUnityStart = actionBuilder(EXERCISE_UNITY_START);
+
+// 'stop' button handling
+export const EXERCISE_STOP = 'EXERCISE_STOP';
+export const exerciseStop = actionBuilder(EXERCISE_STOP);
+
+// 'initialize app' button handling
+export const EXERCISE_APP_INIT = 'EXERCISE_APP_INIT';
+export const exerciseAppInit = actionBuilder(EXERCISE_APP_INIT);
+
+// 'initialize exercise' button handling
+export const EXERCISE_EXERCISE_INIT = 'EXERCISE_EXERCISE_INIT';
+export const exerciseExerciseInit = actionBuilder(EXERCISE_EXERCISE_INIT);
+
+// 'start exercise' button handling
+export const EXERCISE_EXERCISE_START = 'EXERCISE_EXERCISE_START';
+export const exerciseExerciseStart = actionBuilder(EXERCISE_EXERCISE_START);

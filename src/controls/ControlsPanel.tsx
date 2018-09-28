@@ -4,7 +4,6 @@ import { Dispatch } from 'redux';
 
 import './ControlsPanel.css';
 
-import { consoleLog } from '../state/actions/console';
 import {
   controlsAutoUpdate,
   controlsConfigUpdate,
@@ -13,12 +12,12 @@ import {
   controlsSettingsUpdate,
 } from '../state/actions/controls';
 import {
-  unityAppInit,
-  unityExerciseInit,
-  unityExerciseStart,
-  unityInit,
-  unityStop,
-} from '../state/actions/unity';
+  exerciseAppInit,
+  exerciseExerciseInit,
+  exerciseExerciseStart,
+  exerciseStop,
+  exerciseUnityStart,
+} from '../state/actions/exercise';
 import { Callback, DataCallback } from '../state/models/base';
 import { EditForm, IAppState, IControlsState, RunningStage } from '../state/models/state';
 import { getControls } from '../state/selectors/controls';
@@ -55,9 +54,10 @@ export function ControlsPanel(props: Props) {
     case EditForm.Options:
       editForm = (<textarea rows={6} name="Options" value={props.options} onChange={handleInputChange} />);
   }
+  const editFormClass = 'row edit-form' + (editForm ? ' show' : '');
   return (
     <div className="controls">
-      <div className="row">
+      <div className={editFormClass}>
         <div className="col">
           {editForm}
         </div>
@@ -120,20 +120,19 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
       dispatch(controlsFormToggle(form));
     },
     onStart: () => {
-      dispatch(unityInit());
+      dispatch(exerciseUnityStart());
     },
     onStop: () => {
-      dispatch(consoleLog('Stop!'));
-      dispatch(unityStop());
+      dispatch(exerciseStop());
     },
     onInitializeApp: () => {
-      dispatch(unityAppInit());
+      dispatch(exerciseAppInit());
     },
     onInitializeExercise: () => {
-      dispatch(unityExerciseInit());
+      dispatch(exerciseExerciseInit());
     },
     onStartExercise: () => {
-      dispatch(unityExerciseStart());
+      dispatch(exerciseExerciseStart());
     },
   }
 }

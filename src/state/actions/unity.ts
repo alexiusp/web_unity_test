@@ -21,7 +21,7 @@ export const unityExerciseComplete = actionBuilder<{ result: string }>(UNITY_EXE
 
 // exerciseFailed callback
 export const UNITY_EXERCISE_FAILED = 'UNITY_EXERCISE_FAILED';
-export const unityExerciseFailed = actionBuilder(UNITY_EXERCISE_FAILED);
+export const unityExerciseFailed = actionBuilder<{ message: string }>(UNITY_EXERCISE_FAILED, 'message');
 
 /**
  * User invoked or automatically started actions
