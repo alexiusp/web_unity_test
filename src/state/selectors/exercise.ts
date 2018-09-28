@@ -9,3 +9,5 @@ export const getAppConfig = (state: IAppState) => getExerciseState(state).appCon
 export const getExerciseSettings = (state: IAppState) => getCurrentExercise(state).settings;
 
 export const getExerciseOptions = (state: IAppState) => getCurrentExercise(state).options;
+
+export const getLoadingProgress = (state: IAppState) => getCurrentExercise(state).progress;
