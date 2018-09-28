@@ -28,9 +28,6 @@ class App extends React.Component<Props, {}> {
         </header>
         <div className="app-body">
           <ControlsPanel />
-          <div className="progress-container">
-            <div className="progress-bar" style={{ width: (0.1 * 100) + '%' }} />
-          </div>
           <ExerciseContainer />
           <ConsoleContainer />
         </div>
