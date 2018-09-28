@@ -1,8 +1,16 @@
 import { ILoggerMessage } from './console';
 import { CurrentExercise, ExerciseError, ExerciseView } from './exercise';
 
+export enum EditForm {
+  None,
+  AppConfig,
+  Settings,
+  Options,
+}
+
 export interface IControlsState {
   auto: boolean;
+  edit: EditForm;
   config: string;
   options: string;
   settings: string;

@@ -5,7 +5,13 @@ import { Dispatch } from 'redux';
 import './ControlsPanel.css';
 
 import { consoleLog } from '../state/actions/console';
-import { controlsAutoUpdate, controlsConfigUpdate, controlsOptionsUpdate, controlsSettingsUpdate } from '../state/actions/controls';
+import {
+  controlsAutoUpdate,
+  controlsConfigUpdate,
+  controlsFormToggle,
+  controlsOptionsUpdate,
+  controlsSettingsUpdate,
+} from '../state/actions/controls';
 import {
   unityAppInit,
   unityExerciseInit,
@@ -14,7 +20,7 @@ import {
   unityStop,
 } from '../state/actions/unity';
 import { Callback, DataCallback } from '../state/models/base';
-import { IAppState, IControlsState } from '../state/models/state';
+import { EditForm, IAppState, IControlsState } from '../state/models/state';
 import { getControls } from '../state/selectors/controls';
 
 export interface Props extends IControlsState {
@@ -22,6 +28,7 @@ export interface Props extends IControlsState {
   onConfigChange: DataCallback<string>;
   onSettingsChange: DataCallback<string>;
   onOptionsChange: DataCallback<string>;
+  onFormToggle: DataCallback;
   onStart: Callback;
   onStop: Callback;
   onInitializeApp: Callback;
@@ -36,17 +43,23 @@ export function ControlsPanel(props: Props) {
     const value = e.target.value;
     props[handlerName](value);
   };
+  const toggleForm = (form: EditForm) => () => props.onFormToggle(form);
+  let editForm = null;
+  switch (props.edit) {
+    case EditForm.AppConfig:
+      editForm = (<textarea rows={6} name="Config" value={props.config} onChange={handleInputChange} />);
+      break;
+    case EditForm.Settings:
+      editForm = (<textarea rows={6} name="Settings" value={props.settings} onChange={handleInputChange} />);
+      break;
+    case EditForm.Options:
+      editForm = (<textarea rows={6} name="Options" value={props.options} onChange={handleInputChange} />);
+  }
   return (
     <div className="controls">
       <div className="row">
         <div className="col">
-          <label>app config: <textarea name="Config" value={props.config} onChange={handleInputChange} /></label>
-        </div>
-        <div className="col">
-          <label>settings: <textarea name="Settings" value={props.settings} onChange={handleInputChange} /></label>
-        </div>
-        <div className="col">
-          <label>options: <textarea name="Options" value={props.options} onChange={handleInputChange} /></label>
+          {editForm}
         </div>
       </div>
       <div className="row">
@@ -57,10 +70,19 @@ export function ControlsPanel(props: Props) {
           <button onClick={props.onStart}>start Unity &#11208;</button>
         </div>
         <div className="col">
+          <button onClick={toggleForm(EditForm.AppConfig)}>{props.edit === EditForm.AppConfig ? '\u2BC6' : '\u2BC5' }</button>
+        </div>
+        <div className="col">
           <button onClick={props.onInitializeApp}>initialize app &#11208;</button>
         </div>
         <div className="col">
+          <button onClick={toggleForm(EditForm.Settings)}>{props.edit === EditForm.Settings ? '\u2BC6' : '\u2BC5'}</button>
+        </div>
+        <div className="col">
           <button onClick={props.onInitializeExercise}>initialize exercise &#11208;</button>
+        </div>
+        <div className="col">
+          <button onClick={toggleForm(EditForm.Options)}>{props.edit === EditForm.Options ? '\u2BC6' : '\u2BC5'}</button>
         </div>
         <div className="col">
           <button onClick={props.onStartExercise}>start exercise &#11208;</button>
@@ -74,13 +96,9 @@ export function ControlsPanel(props: Props) {
 }
 
 export const mapStateToProps = (state: IAppState) => {
-  const { auto, config, options, settings, start } = getControls(state);
+  const controls = getControls(state);
   return {
-    auto,
-    config,
-    options,
-    settings,
-    start,
+    ...controls,
   };
 }
 
@@ -97,6 +115,9 @@ export const mapDispatchToProps = (dispatch: Dispatch) => {
     },
     onSettingsChange: (value: string) => {
       dispatch(controlsSettingsUpdate(value));
+    },
+    onFormToggle: (form: EditForm) => {
+      dispatch(controlsFormToggle(form));
     },
     onStart: () => {
       dispatch(unityInit());

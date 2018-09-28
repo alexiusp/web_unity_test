@@ -1,3 +1,4 @@
+import { EditForm } from '../models/state';
 import actionBuilder from './actionBuilder';
 
 // auto execution flag update action
@@ -15,3 +16,7 @@ export const controlsOptionsUpdate = actionBuilder<{ options: string }>(CONTROLS
 // updates settings value from ajax or input
 export const CONTROLS_SETTINGS_UPDATE = 'CONTROLS_SETTINGS_UPDATE';
 export const controlsSettingsUpdate = actionBuilder<{ settings: string }>(CONTROLS_SETTINGS_UPDATE, 'settings');
+
+// opens textarea to edit config/settings/options
+export const CONTROLS_FORM_TOGGLE = 'CONTROLS_FORM_TOGGLE';
+export const controlsFormToggle = actionBuilder<{ form: EditForm }>(CONTROLS_FORM_TOGGLE, 'form');

@@ -1,14 +1,16 @@
 import {
   CONTROLS_AUTO_UPDATE,
   CONTROLS_CONFIG_UPDATE,
+  CONTROLS_FORM_TOGGLE,
   CONTROLS_OPTIONS_UPDATE,
   CONTROLS_SETTINGS_UPDATE,
 } from '../actions/controls';
 import { IAction, IBaseAction } from '../models/actions';
-import { IControlsState } from '../models/state';
+import { EditForm, IControlsState } from '../models/state';
 
 export const initialState: IControlsState = {
   auto: true,
+  edit: EditForm.None,
   config: '',
   options: '',
   settings: '',
@@ -17,6 +19,13 @@ export const initialState: IControlsState = {
 
 export function controls(state = initialState, action: IBaseAction) {
   switch (action.type) {
+    case CONTROLS_FORM_TOGGLE: {
+      const toggleForm = (action as IAction).payload.form;
+      return {
+        ...state,
+        edit: (toggleForm === state.edit) ? EditForm.None : toggleForm,
+      }
+    }
     case CONTROLS_AUTO_UPDATE:
       return {
         ...state,
