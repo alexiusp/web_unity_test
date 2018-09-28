@@ -20,7 +20,7 @@ import {
   unityStop,
 } from '../state/actions/unity';
 import { Callback, DataCallback } from '../state/models/base';
-import { EditForm, IAppState, IControlsState } from '../state/models/state';
+import { EditForm, IAppState, IControlsState, RunningStage } from '../state/models/state';
 import { getControls } from '../state/selectors/controls';
 
 export interface Props extends IControlsState {
@@ -66,26 +66,26 @@ export function ControlsPanel(props: Props) {
         <div className="col">
           <label>auto execute: <input name="auto" type="checkbox" checked={props.auto} onChange={props.onAutoChange} /></label>
         </div>
-        <div className="col">
-          <button onClick={props.onStart}>start Unity &#11208;</button>
+        <div className={(props.stage > RunningStage.None) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.None} onClick={props.onStart}>start Unity &#11208;</button>
         </div>
-        <div className="col">
-          <button onClick={toggleForm(EditForm.AppConfig)}>{props.edit === EditForm.AppConfig ? '\u2BC6' : '\u2BC5' }</button>
+        <div className={(props.stage > RunningStage.UnityInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.UnityInit} onClick={toggleForm(EditForm.AppConfig)}>{props.edit === EditForm.AppConfig ? '\u2BC6' : '\u2BC5' }</button>
         </div>
-        <div className="col">
-          <button onClick={props.onInitializeApp}>initialize app &#11208;</button>
+        <div className={(props.stage > RunningStage.UnityInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.UnityInit} onClick={props.onInitializeApp}>initialize app &#11208;</button>
         </div>
-        <div className="col">
-          <button onClick={toggleForm(EditForm.Settings)}>{props.edit === EditForm.Settings ? '\u2BC6' : '\u2BC5'}</button>
+        <div className={(props.stage > RunningStage.AppInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.AppInit} onClick={toggleForm(EditForm.Settings)}>{props.edit === EditForm.Settings ? '\u2BC6' : '\u2BC5'}</button>
         </div>
-        <div className="col">
-          <button onClick={props.onInitializeExercise}>initialize exercise &#11208;</button>
+        <div className={(props.stage > RunningStage.AppInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.AppInit} onClick={props.onInitializeExercise}>initialize exercise &#11208;</button>
         </div>
-        <div className="col">
-          <button onClick={toggleForm(EditForm.Options)}>{props.edit === EditForm.Options ? '\u2BC6' : '\u2BC5'}</button>
+        <div className={(props.stage > RunningStage.ExerciseInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.ExerciseInit} onClick={toggleForm(EditForm.Options)}>{props.edit === EditForm.Options ? '\u2BC6' : '\u2BC5'}</button>
         </div>
-        <div className="col">
-          <button onClick={props.onStartExercise}>start exercise &#11208;</button>
+        <div className={(props.stage > RunningStage.ExerciseInit) ? 'col completed' : 'col'}>
+          <button disabled={props.stage > RunningStage.ExerciseInit} onClick={props.onStartExercise}>start exercise &#11208;</button>
         </div>
         <div className="col pull-right">
           <button onClick={props.onStop}>&#11200; stop</button>

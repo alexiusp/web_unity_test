@@ -19,8 +19,8 @@ import {
   unityEngineReady,
   unityExerciseComplete,
   unityExerciseFailed,
-  unityExerciseInit,
   unityExerciseReady,
+  unityExerciseRunning,
   unityLoaderStart,
   unityStop,
 } from '../actions/unity';
@@ -101,7 +101,8 @@ export function* engineReadySaga() {
 
 export function* appEngineSaga() {
   try {
-    while (true) {
+    let autoRun = true;
+    while (autoRun) {
       const settings = yield select(getExerciseSettings);
       yield call(sendMessage, 'Main', 'InitializeExercise', settings);
       yield put(consoleProgressStart());
@@ -112,6 +113,7 @@ export function* appEngineSaga() {
       if (!isAuto) {
         yield take(UNITY_EXERCISE_START);
       }
+      yield put(unityExerciseRunning());
       const options = yield select(getExerciseOptions);
       yield call(sendMessage, 'Main', 'StartExercise', options);
       const exerciseCompleteAction: IAction<{ result: string }> = yield take(UNITY_EXERCISE_COMPLETE);
@@ -126,13 +128,10 @@ export function* appEngineSaga() {
       const nextExercise = result.name;
       yield put(exerciseSelect(nextExercise));
       yield take(EXERCISE_READY);
-      const stillAuto = yield select(getAutoValue);
-      if (stillAuto) {
-        yield put(unityExerciseInit());
-      }
+      autoRun = yield select(getAutoValue);
     }
   } finally {
-    yield put(consoleLog('exercise workflow cancelled'));
+    yield put(consoleLog('exercise workflow finished'));
   }
 }
 

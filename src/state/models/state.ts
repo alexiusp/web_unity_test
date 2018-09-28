@@ -8,13 +8,21 @@ export enum EditForm {
   Options,
 }
 
+export enum RunningStage {
+  None,
+  UnityInit,
+  AppInit,
+  ExerciseInit,
+  ExerciseRunning,
+}
+
 export interface IControlsState {
   auto: boolean;
   edit: EditForm;
   config: string;
   options: string;
   settings: string;
-  start: boolean;
+  stage: RunningStage;
 }
 
 export interface IConsoleState {

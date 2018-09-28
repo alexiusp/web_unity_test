@@ -47,6 +47,10 @@ export const unityExerciseInit = actionBuilder(UNITY_EXERCISE_INIT);
 export const UNITY_EXERCISE_START = 'UNITY_EXERCISE_START';
 export const unityExerciseStart = actionBuilder(UNITY_EXERCISE_START);
 
+// exercise is running
+export const UNITY_EXERCISE_RUNNING = 'UNITY_EXERCISE_RUNNING';
+export const unityExerciseRunning = actionBuilder(UNITY_EXERCISE_RUNNING);
+
 // stop everything
 export const UNITY_STOP = 'UNITY_STOP';
 export const unityStop = actionBuilder(UNITY_STOP);

@@ -5,8 +5,16 @@ import {
   CONTROLS_OPTIONS_UPDATE,
   CONTROLS_SETTINGS_UPDATE,
 } from '../actions/controls';
+import {
+  UNITY_ENGINE_READY,
+  UNITY_EXERCISE_COMPLETE,
+  UNITY_EXERCISE_READY,
+  UNITY_EXERCISE_RUNNING,
+  UNITY_INIT,
+  UNITY_STOP,
+} from '../actions/unity';
 import { IAction, IBaseAction } from '../models/actions';
-import { EditForm, IControlsState } from '../models/state';
+import { EditForm, IControlsState, RunningStage } from '../models/state';
 
 export const initialState: IControlsState = {
   auto: true,
@@ -14,7 +22,7 @@ export const initialState: IControlsState = {
   config: '',
   options: '',
   settings: '',
-  start: false,
+  stage: RunningStage.None,
 };
 
 export function controls(state = initialState, action: IBaseAction) {
@@ -52,6 +60,36 @@ export function controls(state = initialState, action: IBaseAction) {
         settings: (typeof value === 'string') ? value : JSON.stringify(value),
       }
     }
+    case UNITY_INIT:
+      return {
+        ...state,
+        stage: RunningStage.UnityInit,
+      }
+    case UNITY_ENGINE_READY:
+      return {
+        ...state,
+        stage: RunningStage.AppInit,
+      }
+    case UNITY_EXERCISE_READY:
+      return {
+        ...state,
+        stage: RunningStage.ExerciseInit,
+      }
+    case UNITY_EXERCISE_RUNNING:
+      return {
+        ...state,
+        stage: RunningStage.ExerciseRunning,
+      }
+    case UNITY_EXERCISE_COMPLETE:
+      return {
+        ...state,
+        stage: RunningStage.AppInit,
+      }
+    case UNITY_STOP:
+      return {
+        ...state,
+        stage: RunningStage.AppInit,
+      }
   }
   return state;
 }
