@@ -26,12 +26,14 @@ class App extends React.Component<Props, {}> {
         <header className="app-header">
           <h1 className="app-title">UnityLoader test</h1>
         </header>
-        <ControlsPanel />
-        <div className="progress-container">
-          <div className="progress-bar" style={{ width: (0.1 * 100) + '%' }} />
+        <div className="app-body">
+          <ControlsPanel />
+          <div className="progress-container">
+            <div className="progress-bar" style={{ width: (0.1 * 100) + '%' }} />
+          </div>
+          <ExerciseContainer />
+          <ConsoleContainer />
         </div>
-        <ExerciseContainer />
-        <ConsoleContainer />
       </div>
     );
   }

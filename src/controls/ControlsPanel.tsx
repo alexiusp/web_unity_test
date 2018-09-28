@@ -38,23 +38,35 @@ export function ControlsPanel(props: Props) {
   };
   return (
     <div className="controls">
-      <div className="controls">
-        <div className="controls-row">
-          <label>auto execute: <input name="auto" type="checkbox" checked={props.auto} onChange={props.onAutoChange} /></label>&nbsp;
-            <button onClick={props.onStart}>start Unity</button>
-          <button onClick={props.onStop}>stop</button>
+      <div className="row">
+        <div className="col">
+          <label>app config: <textarea name="Config" value={props.config} onChange={handleInputChange} /></label>
         </div>
-        <div className="controls-row">
-          <label>app config: <textarea name="Config" value={props.config} onChange={handleInputChange} /></label>&nbsp;
-            <button onClick={props.onInitializeApp}>initialize app</button>
+        <div className="col">
+          <label>settings: <textarea name="Settings" value={props.settings} onChange={handleInputChange} /></label>
         </div>
-        <div className="controls-row">
-          <label>settings: <textarea name="Settings" value={props.settings} onChange={handleInputChange} /></label>&nbsp;
-            <button onClick={props.onInitializeExercise}>initialize exercise</button>
+        <div className="col">
+          <label>options: <textarea name="Options" value={props.options} onChange={handleInputChange} /></label>
         </div>
-        <div className="controls-row">
-          <label>options: <textarea name="Options" value={props.options} onChange={handleInputChange} /></label>&nbsp;
-            <button onClick={props.onStartExercise}>start exercise</button>
+      </div>
+      <div className="row">
+        <div className="col">
+          <label>auto execute: <input name="auto" type="checkbox" checked={props.auto} onChange={props.onAutoChange} /></label>
+        </div>
+        <div className="col">
+          <button onClick={props.onStart}>start Unity &#11208;</button>
+        </div>
+        <div className="col">
+          <button onClick={props.onInitializeApp}>initialize app &#11208;</button>
+        </div>
+        <div className="col">
+          <button onClick={props.onInitializeExercise}>initialize exercise &#11208;</button>
+        </div>
+        <div className="col">
+          <button onClick={props.onStartExercise}>start exercise &#11208;</button>
+        </div>
+        <div className="col pull-right">
+          <button onClick={props.onStop}>&#11200; stop</button>
         </div>
       </div>
     </div>
