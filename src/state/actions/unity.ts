@@ -17,11 +17,24 @@ export const unityExerciseReady = actionBuilder(UNITY_EXERCISE_READY);
 
 // completeExercise callback
 export const UNITY_EXERCISE_COMPLETE = 'UNITY_EXERCISE_COMPLETE';
-export const unityExerciseComplete = actionBuilder<{ result: string }>(UNITY_EXERCISE_COMPLETE, 'result');
+export interface UnityCompletePayload {
+  result: string;
+}
+export const unityExerciseComplete = actionBuilder<UnityCompletePayload>(UNITY_EXERCISE_COMPLETE, 'result');
 
 // exerciseFailed callback
 export const UNITY_EXERCISE_FAILED = 'UNITY_EXERCISE_FAILED';
-export const unityExerciseFailed = actionBuilder<{ message: string }>(UNITY_EXERCISE_FAILED, 'message');
+export interface UnityFailPayload {
+  message: string;
+}
+export const unityExerciseFailed = actionBuilder<UnityFailPayload>(UNITY_EXERCISE_FAILED, 'message');
+
+// updates progress value from UnityLoader
+export const UNITY_PROGRESS_UPDATE = 'UNITY_PROGRESS_UPDATE';
+export interface UnityProgressPayload {
+  progress: number;
+}
+export const unityProgressUpdate = actionBuilder<UnityProgressPayload>(UNITY_PROGRESS_UPDATE, 'progress');
 
 /**
  * custom execution flow actions

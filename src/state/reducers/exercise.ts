@@ -1,10 +1,10 @@
 import {
   EXERCISE_CONFIG_UPDATE,
-  EXERCISE_LOADING_UPDATE,
   EXERCISE_OPTIONS_UPDATE,
   EXERCISE_SELECT,
   EXERCISE_SETTINGS_UPDATE,
 } from '../actions/exercise';
+import { UNITY_PROGRESS_UPDATE } from '../actions/unity';
 import { IAction, IBaseAction } from '../models/actions';
 import { CurrentExercise } from '../models/exercise';
 import { IExerciseState } from '../models/state';
@@ -25,7 +25,7 @@ export const initialState: IExerciseState = {
 
 export function exercise(state = initialState, action: IBaseAction) {
   switch (action.type) {
-    case EXERCISE_LOADING_UPDATE: {
+    case UNITY_PROGRESS_UPDATE: {
       const progress = (action as IAction).payload.progress;
       return {
         ...state,

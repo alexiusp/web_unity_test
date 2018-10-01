@@ -3,7 +3,6 @@ import { all, call, fork, put, select, take, takeLatest } from 'redux-saga/effec
 
 import { BASE_PATH, CANVAS_ID } from '../../constants';
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
-import { exerciseLoadingUpdate } from '../actions/exercise';
 import {
   UNITY_APP_INIT,
   UNITY_APP_READY,
@@ -22,6 +21,7 @@ import {
   unityExerciseReady,
   unityExerciseRunning,
   unityLoaderStart,
+  unityProgressUpdate,
   unityStop,
 } from '../actions/unity';
 import { IAction } from '../models/actions';
@@ -85,7 +85,7 @@ export function* unityLoaderStartSaga(dispatch: Dispatch) {
   yield put(consoleLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
   // const path = appConfigPath + '?rnd=' + getCacheBuster();
-  const onProgress = (inst: IUnityInstance, progress: number) => dispatch(exerciseLoadingUpdate(progress));
+  const onProgress = (inst: IUnityInstance, progress: number) => dispatch(unityProgressUpdate(progress));
   instance = UnityLoader.instantiate(CANVAS_ID, appConfigPath, { onProgress });
   yield put(consoleProgressStart());
 }

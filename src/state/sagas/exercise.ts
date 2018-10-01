@@ -27,6 +27,7 @@ import {
   UNITY_EXERCISE_COMPLETE,
   UNITY_EXERCISE_READY,
   unityAppInit,
+  UnityCompletePayload,
   unityExerciseInit,
   unityExerciseStart,
   unityInit,
@@ -111,7 +112,7 @@ export function* exerciseStartSaga() {
   yield put(unityExerciseStart());
 }
 
-export function* exerciseCompleteSaga(action: IAction<{ result: string }>) {
+export function* exerciseCompleteSaga(action: IAction<UnityCompletePayload>) {
   try {
     const resultStr = action.payload.result;
     yield put(consoleLog(`completeExercise: ${resultStr}`));
