@@ -24,6 +24,7 @@ import {
   unityExerciseInit,
   unityExerciseReady,
   unityExerciseRunning,
+  unityExerciseStart,
   unityLoaderStart,
   unityStop,
 } from '../actions/unity';
@@ -119,7 +120,10 @@ export function* appInitSaga() {
   yield put(consoleProgressStart());
 }
 
-export function* unityEngineStartupSaga() {
+export function* unityEngineStartupSaga(action: IAction) {
+  if (action.type !== UNITY_APP_INIT) {
+    return;
+  }
   yield fork(appInitSaga);
   // wait for engineReady
   yield take(UNITY_ENGINE_READY);
@@ -131,43 +135,52 @@ export function* unityEngineStartupSaga() {
   }
 }
 
-export function* appEngineSaga(action: IAction) {
+export function* exerciseStartupSaga(action: IAction) {
   if (action.type !== UNITY_EXERCISE_INIT) {
-    yield put(consoleLog('exercise workflow finished'));
+    return;
+  }
+  const settings = yield select(getExerciseSettings);
+  yield call(sendMessage, 'Main', 'InitializeExercise', settings);
+  yield put(consoleProgressStart());
+  yield take(UNITY_EXERCISE_READY);
+  yield put(consoleLog('exerciseReady called'));
+  yield put(consoleProgressEnd());
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(unityExerciseStart());
+  }
+}
+
+export function* exerciseStartSaga(action: IAction) {
+  if (action.type !== UNITY_EXERCISE_START) {
+    return;
+  }
+  yield put(unityExerciseRunning());
+  const options = yield select(getExerciseOptions);
+  yield call(sendMessage, 'Main', 'StartExercise', options);
+}
+
+export function* exerciseCompleteSaga(action: IAction<{ result: string }>) {
+  if (action.type !== UNITY_EXERCISE_COMPLETE) {
     return;
   }
   try {
-    let autoRun = true;
-    while (autoRun) {
-      const settings = yield select(getExerciseSettings);
-      yield call(sendMessage, 'Main', 'InitializeExercise', settings);
-      yield put(consoleProgressStart());
-      yield take(UNITY_EXERCISE_READY);
-      yield put(consoleProgressEnd());
-      yield put(consoleLog('exerciseReady called'));
-      const isAuto = yield select(getAutoValue);
-      if (!isAuto) {
-        yield take(UNITY_EXERCISE_START);
-      }
-      yield put(unityExerciseRunning());
-      const options = yield select(getExerciseOptions);
-      yield call(sendMessage, 'Main', 'StartExercise', options);
-      const exerciseCompleteAction: IAction<{ result: string }> = yield take(UNITY_EXERCISE_COMPLETE);
-      const resultStr = exerciseCompleteAction.payload.result;
-      yield put(consoleLog(`completeExercise: ${resultStr}`));
-      const result = JSON.parse(resultStr);
-      if (!result || !result.name) {
-        yield put(consoleError('Wrong completeExercise argument!'));
-        yield put(unityStop());
-        throw new Error();
-      }
-      const nextExercise = result.name;
-      yield put(exerciseSelect(nextExercise));
-      yield take(EXERCISE_READY);
-      autoRun = yield select(getAutoValue);
+    const resultStr = action.payload.result;
+    yield put(consoleLog(`completeExercise: ${resultStr}`));
+    const result = JSON.parse(resultStr);
+    if (!result || !result.name) {
+      throw new Error();
     }
-  } finally {
-    yield put(consoleLog('exercise workflow finished'));
+    const nextExercise = result.name;
+    yield put(exerciseSelect(nextExercise));
+    yield take(EXERCISE_READY);
+    const isAuto = yield select(getAutoValue);
+    if (isAuto) {
+      yield put(unityExerciseInit());
+    }
+  } catch (error) {
+    yield put(consoleError('Wrong completeExercise format!'));
+    yield put(unityStop());
   }
 }
 
@@ -192,7 +205,9 @@ export function* unityFlowStartSaga(dispatch: Dispatch) {
 export function* unityWatcher(dispatch: Dispatch) {
   yield all([
     takeLatest(UNITY_INIT, unityFlowStartSaga, dispatch),
-    takeLatest(UNITY_APP_INIT, unityEngineStartupSaga),
-    takeLatest([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], appEngineSaga),
+    takeLatest([UNITY_APP_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], unityEngineStartupSaga),
+    takeLatest([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseStartupSaga),
+    takeLatest([UNITY_EXERCISE_START, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseStartSaga),
+    takeLatest([UNITY_EXERCISE_COMPLETE, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseCompleteSaga),
   ]);
 }

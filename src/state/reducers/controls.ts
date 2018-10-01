@@ -88,6 +88,7 @@ export function controls(state = initialState, action: IBaseAction) {
     case UNITY_STOP:
       return {
         ...state,
+        auto: false,
         stage: RunningStage.AppInit,
       }
   }
