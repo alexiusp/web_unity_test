@@ -24,7 +24,7 @@ export const UNITY_EXERCISE_FAILED = 'UNITY_EXERCISE_FAILED';
 export const unityExerciseFailed = actionBuilder<{ message: string }>(UNITY_EXERCISE_FAILED, 'message');
 
 /**
- * User invoked or automatically started actions
+ * custom execution flow actions
  */
 
 // inject unity loader into document

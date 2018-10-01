@@ -3,12 +3,11 @@ import { all, call, fork, put, select, take, takeLatest } from 'redux-saga/effec
 
 import { BASE_PATH, CANVAS_ID } from '../../constants';
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
-import { EXERCISE_READY, exerciseLoadingUpdate, exerciseSelect } from '../actions/exercise';
+import { exerciseLoadingUpdate } from '../actions/exercise';
 import {
   UNITY_APP_INIT,
   UNITY_APP_READY,
   UNITY_ENGINE_READY,
-  UNITY_EXERCISE_COMPLETE,
   UNITY_EXERCISE_FAILED,
   UNITY_EXERCISE_INIT,
   UNITY_EXERCISE_READY,
@@ -16,21 +15,17 @@ import {
   UNITY_INIT,
   UNITY_LOADER_START,
   UNITY_STOP,
-  unityAppInit,
   unityAppReady,
   unityEngineReady,
   unityExerciseComplete,
   unityExerciseFailed,
-  unityExerciseInit,
   unityExerciseReady,
   unityExerciseRunning,
-  unityExerciseStart,
   unityLoaderStart,
   unityStop,
 } from '../actions/unity';
 import { IAction } from '../models/actions';
 import { IUnityInstance } from '../models/base';
-import { getAutoValue } from '../selectors/controls';
 import { getAppConfig, getExerciseOptions, getExerciseSettings } from '../selectors/exercise';
 
 const BUILD_PATH = `${BASE_PATH}/Build`;
@@ -58,6 +53,7 @@ function getCacheBuster() {
 }
 
 let startTime: number;
+let endTime: number;
 const timerName = 'timer';
 function getTimestamp() {
   return Math.trunc(Date.now() / 1000);
@@ -107,19 +103,17 @@ export function* unityInitTransitionSaga(dispatch: Dispatch) {
 export function* appReadySaga() {
   yield put(consoleLog('appReady called'));
   yield put(consoleProgressEnd());
-  const isAuto = yield select(getAutoValue);
-  if (isAuto) {
-    yield put(unityAppInit());
-  }
 }
 
 export function* appInitSaga() {
   const configStr = yield select(getAppConfig);
   const config = JSON.parse(configStr);
-  config.startedAt = startTime;
-  const finishedAt = getTimestamp();
-  yield put(consoleLog(`${timerName} finished at ${finishedAt}`));
-  console.timeEnd(timerName);
+  if (!endTime) {
+    config.startedAt = startTime;
+    endTime = getTimestamp();
+    yield put(consoleLog(`${timerName} finished at ${endTime} (=${endTime - startTime}s)`));
+    console.timeEnd(timerName);
+  }
   yield call(sendMessage, 'Main', 'InitializeApp', JSON.stringify(config));
   yield put(consoleProgressStart());
 }
@@ -133,10 +127,6 @@ export function* unityEngineStartupSaga(action: IAction) {
   yield take(UNITY_ENGINE_READY);
   yield put(consoleLog('engineReady called'));
   yield put(consoleProgressEnd());
-  const isAuto = yield select(getAutoValue);
-  if (isAuto) {
-    yield put(unityExerciseInit());
-  }
 }
 
 export function* exerciseStartupSaga(action: IAction) {
@@ -149,10 +139,6 @@ export function* exerciseStartupSaga(action: IAction) {
   yield take(UNITY_EXERCISE_READY);
   yield put(consoleLog('exerciseReady called'));
   yield put(consoleProgressEnd());
-  const isAuto = yield select(getAutoValue);
-  if (isAuto) {
-    yield put(unityExerciseStart());
-  }
 }
 
 export function* exerciseStartSaga(action: IAction) {
@@ -162,30 +148,6 @@ export function* exerciseStartSaga(action: IAction) {
   yield put(unityExerciseRunning());
   const options = yield select(getExerciseOptions);
   yield call(sendMessage, 'Main', 'StartExercise', options);
-}
-
-export function* exerciseCompleteSaga(action: IAction<{ result: string }>) {
-  if (action.type !== UNITY_EXERCISE_COMPLETE) {
-    return;
-  }
-  try {
-    const resultStr = action.payload.result;
-    yield put(consoleLog(`completeExercise: ${resultStr}`));
-    const result = JSON.parse(resultStr);
-    if (!result || !result.name) {
-      throw new Error();
-    }
-    const nextExercise = result.name;
-    yield put(exerciseSelect(nextExercise));
-    yield take(EXERCISE_READY);
-    const isAuto = yield select(getAutoValue);
-    if (isAuto) {
-      yield put(unityExerciseInit());
-    }
-  } catch (error) {
-    yield put(consoleError('Wrong completeExercise format!'));
-    yield put(unityStop());
-  }
 }
 
 export function* sendMessage(objectName: string, methodName: string, value: any) {
@@ -212,6 +174,5 @@ export function* unityWatcher(dispatch: Dispatch) {
     takeLatest([UNITY_APP_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], unityEngineStartupSaga),
     takeLatest([UNITY_EXERCISE_INIT, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseStartupSaga),
     takeLatest([UNITY_EXERCISE_START, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseStartSaga),
-    takeLatest([UNITY_EXERCISE_COMPLETE, UNITY_STOP, UNITY_EXERCISE_FAILED], exerciseCompleteSaga),
   ]);
 }

@@ -1,22 +1,31 @@
 import axios from 'axios';
-import { all, put, select, takeEvery } from 'redux-saga/effects';
+import { all, put, select, take, takeEvery } from 'redux-saga/effects';
 
 import { CONFIG_PATH } from '../../constants';
-import { consoleLog } from '../actions/console';
+import { consoleError, consoleLog } from '../actions/console';
 import { controlsOptionsUpdate, controlsSettingsUpdate } from '../actions/controls';
 import {
   EXERCISE_APP_INIT,
   EXERCISE_EXERCISE_INIT,
   EXERCISE_EXERCISE_START,
+  EXERCISE_READY,
   EXERCISE_SELECT,
   EXERCISE_STOP,
   EXERCISE_UNITY_START,
+  exerciseAppInit,
   exerciseConfigUpdate,
+  exerciseExerciseInit,
+  exerciseExerciseStart,
   exerciseOptionsUpdate,
   exerciseReady,
+  exerciseSelect,
   exerciseSettingsUpdate,
 } from '../actions/exercise';
 import {
+  UNITY_APP_READY,
+  UNITY_ENGINE_READY,
+  UNITY_EXERCISE_COMPLETE,
+  UNITY_EXERCISE_READY,
   unityAppInit,
   unityExerciseInit,
   unityExerciseStart,
@@ -26,6 +35,7 @@ import {
 import { IAction } from '../models/actions';
 import {
   getAppConfig,
+  getAutoValue,
   getExerciseOptions,
   getExerciseSettings,
 } from '../selectors/controls';
@@ -52,6 +62,11 @@ export function* selectExerciseSaga(action: IAction<{ name: string }>) {
 export function* startUnitySaga() {
   yield put(consoleLog('Start!'));
   yield put(unityInit());
+  yield take(UNITY_APP_READY);
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(exerciseAppInit());
+  }
 }
 
 export function* stopExerciseSaga() {
@@ -66,6 +81,11 @@ export function* appInitSaga() {
   yield put(exerciseConfigUpdate(config));
   // send event to unity
   yield put(unityAppInit());
+  yield take(UNITY_ENGINE_READY);
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(exerciseExerciseInit());
+  }
 }
 
 export function* exerciseInitSaga() {
@@ -75,6 +95,11 @@ export function* exerciseInitSaga() {
   yield put(exerciseSettingsUpdate(settings));
   // send event to unity
   yield put(unityExerciseInit());
+  yield take(UNITY_EXERCISE_READY);
+  const isAuto = yield select(getAutoValue);
+  if (isAuto) {
+    yield put(exerciseExerciseStart());
+  }
 }
 
 export function* exerciseStartSaga() {
@@ -86,6 +111,28 @@ export function* exerciseStartSaga() {
   yield put(unityExerciseStart());
 }
 
+export function* exerciseCompleteSaga(action: IAction<{ result: string }>) {
+  try {
+    const resultStr = action.payload.result;
+    yield put(consoleLog(`completeExercise: ${resultStr}`));
+    const isAuto = yield select(getAutoValue);
+    if (!isAuto) {
+      return;
+    }
+    const result = JSON.parse(resultStr);
+    if (!result || !result.name) {
+      throw new Error();
+    }
+    const nextExercise = result.name;
+    yield put(exerciseSelect(nextExercise));
+    yield take(EXERCISE_READY);
+    yield put(exerciseExerciseInit());
+  } catch (error) {
+    yield put(consoleError('Wrong completeExercise format!'));
+    yield put(unityStop());
+  }
+}
+
 export function* exerciseWatcher() {
   yield all([
     takeEvery(EXERCISE_SELECT, selectExerciseSaga),
@@ -94,5 +141,6 @@ export function* exerciseWatcher() {
     takeEvery(EXERCISE_APP_INIT, appInitSaga),
     takeEvery(EXERCISE_EXERCISE_INIT, exerciseInitSaga),
     takeEvery(EXERCISE_EXERCISE_START, exerciseStartSaga),
+    takeEvery(UNITY_EXERCISE_COMPLETE, exerciseCompleteSaga),
   ]);
 }

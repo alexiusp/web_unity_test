@@ -42,3 +42,7 @@ export const exerciseExerciseInit = actionBuilder(EXERCISE_EXERCISE_INIT);
 // 'start exercise' button handling
 export const EXERCISE_EXERCISE_START = 'EXERCISE_EXERCISE_START';
 export const exerciseExerciseStart = actionBuilder(EXERCISE_EXERCISE_START);
+
+// custom action when exercise was completed
+export const EXERCISE_COMPLETE = 'EXERCISE_COMPLETE';
+export const exerciseComplete = actionBuilder<{ result: string }>(EXERCISE_COMPLETE, 'result');
