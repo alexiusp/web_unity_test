@@ -59,9 +59,12 @@ function getCacheBuster() {
 
 let startTime: number;
 const timerName = 'timer';
+function getTimestamp() {
+  return Math.trunc(Date.now() / 1000);
+}
 
 export function unityInitSaga(dispatch: Dispatch) {
-  startTime = Math.trunc(Date.now() / 1000);
+  startTime = getTimestamp();
   console.log(`${timerName} started at ${startTime}`);
   console.time(timerName);
   // app started handler
@@ -114,7 +117,8 @@ export function* appInitSaga() {
   const configStr = yield select(getAppConfig);
   const config = JSON.parse(configStr);
   config.startedAt = startTime;
-  console.log(`${timerName} finished at ${Date.now()}`);
+  const finishedAt = getTimestamp();
+  console.log(`${timerName} finished at ${finishedAt}`);
   console.timeEnd(timerName);
   yield call(sendMessage, 'Main', 'InitializeApp', JSON.stringify(config));
   yield put(consoleProgressStart());
