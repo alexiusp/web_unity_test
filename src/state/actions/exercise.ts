@@ -2,7 +2,7 @@ import actionBuilder from './actionBuilder';
 
 // update app config received from S3
 export const EXERCISE_CONFIG_UPDATE = 'EXERCISE_CONFIG_UPDATE';
-export const exerciseConfigUpdate = actionBuilder<{ config: any }>(EXERCISE_CONFIG_UPDATE, 'config');
+export const exerciseConfigUpdate = actionBuilder<{ config: string }>(EXERCISE_CONFIG_UPDATE, 'config');
 
 export const EXERCISE_SELECT = 'EXERCISE_SELECT';
 export const exerciseSelect = actionBuilder<{ name: string }>(EXERCISE_SELECT, 'name');

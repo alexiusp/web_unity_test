@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { all, call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
+import { all, call, fork, put, take, takeLatest } from 'redux-saga/effects';
 
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
 import {
@@ -13,19 +13,21 @@ import {
   UNITY_INIT,
   UNITY_LOADER_START,
   UNITY_STOP,
+  UnityAppInitPayload,
   unityAppReady,
   unityEngineReady,
   unityExerciseComplete,
   unityExerciseFailed,
+  UnityExerciseInitPayload,
   unityExerciseReady,
   unityExerciseRunning,
+  UnityExerciseStartPayload,
   UnityInitPayload,
   unityLoaderStart,
   unityProgressUpdate,
   unityStop,
 } from '../actions/unity';
 import { IAction } from '../models/actions';
-import { getAppConfig, getExerciseOptions, getExerciseSettings } from '../selectors/exercise';
 
 export interface IUnityInstance {
   SendMessage: (objectName: string, methodName: string, value: string) => void,
@@ -108,8 +110,7 @@ export function* appReadySaga() {
   yield put(consoleProgressEnd());
 }
 
-export function* appInitSaga() {
-  const configStr = yield select(getAppConfig);
+export function* appInitSaga(configStr: string) {
   const config = JSON.parse(configStr);
   if (!endTime) {
     config.startedAt = startTime;
@@ -121,22 +122,23 @@ export function* appInitSaga() {
   yield put(consoleProgressStart());
 }
 
-export function* unityEngineStartupSaga(action: IAction) {
+export function* unityEngineStartupSaga(action: IAction<UnityAppInitPayload>) {
   if (action.type !== UNITY_APP_INIT) {
     return;
   }
-  yield fork(appInitSaga);
+  const { config } = action.payload;
+  yield fork(appInitSaga, config);
   // wait for engineReady
   yield take(UNITY_ENGINE_READY);
   yield put(consoleLog('engineReady called'));
   yield put(consoleProgressEnd());
 }
 
-export function* exerciseStartupSaga(action: IAction) {
+export function* exerciseStartupSaga(action: IAction<UnityExerciseInitPayload>) {
   if (action.type !== UNITY_EXERCISE_INIT) {
     return;
   }
-  const settings = yield select(getExerciseSettings);
+  const settings = action.payload.settings;
   yield call(sendMessage, 'Main', 'InitializeExercise', settings);
   yield put(consoleProgressStart());
   yield take(UNITY_EXERCISE_READY);
@@ -144,12 +146,12 @@ export function* exerciseStartupSaga(action: IAction) {
   yield put(consoleProgressEnd());
 }
 
-export function* exerciseStartSaga(action: IAction) {
+export function* exerciseStartSaga(action: IAction<UnityExerciseStartPayload>) {
   if (action.type !== UNITY_EXERCISE_START) {
     return;
   }
   yield put(unityExerciseRunning());
-  const options = yield select(getExerciseOptions);
+  const options = action.payload.options;
   yield call(sendMessage, 'Main', 'StartExercise', options);
 }
 

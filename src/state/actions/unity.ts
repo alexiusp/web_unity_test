@@ -55,15 +55,24 @@ export const unityLoaderStart = actionBuilder(UNITY_LOADER_START);
 
 // initialize app
 export const UNITY_APP_INIT = 'UNITY_APP_INIT';
-export const unityAppInit = actionBuilder(UNITY_APP_INIT);
+export interface UnityAppInitPayload {
+  config: string;
+}
+export const unityAppInit = actionBuilder<UnityAppInitPayload>(UNITY_APP_INIT, 'config');
 
 // initialize exercise
 export const UNITY_EXERCISE_INIT = 'UNITY_EXERCISE_INIT';
-export const unityExerciseInit = actionBuilder(UNITY_EXERCISE_INIT);
+export interface UnityExerciseInitPayload {
+  settings: string;
+}
+export const unityExerciseInit = actionBuilder<UnityExerciseInitPayload>(UNITY_EXERCISE_INIT, 'settings');
 
 // start exercise
 export const UNITY_EXERCISE_START = 'UNITY_EXERCISE_START';
-export const unityExerciseStart = actionBuilder(UNITY_EXERCISE_START);
+export interface UnityExerciseStartPayload {
+  options: string;
+}
+export const unityExerciseStart = actionBuilder<UnityExerciseStartPayload>(UNITY_EXERCISE_START, 'options');
 
 // exercise is running
 export const UNITY_EXERCISE_RUNNING = 'UNITY_EXERCISE_RUNNING';

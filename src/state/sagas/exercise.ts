@@ -81,7 +81,7 @@ export function* appInitSaga() {
   // update working copy
   yield put(exerciseConfigUpdate(config));
   // send event to unity
-  yield put(unityAppInit());
+  yield put(unityAppInit(config));
   yield take(UNITY_ENGINE_READY);
   const isAuto = yield select(getAutoValue);
   if (isAuto) {
@@ -95,7 +95,7 @@ export function* exerciseInitSaga() {
   // update working copy
   yield put(exerciseSettingsUpdate(settings));
   // send event to unity
-  yield put(unityExerciseInit());
+  yield put(unityExerciseInit(settings));
   yield take(UNITY_EXERCISE_READY);
   const isAuto = yield select(getAutoValue);
   if (isAuto) {
@@ -109,7 +109,7 @@ export function* exerciseStartSaga() {
   // update working copy
   yield put(exerciseOptionsUpdate(options));
   // send event to unity
-  yield put(unityExerciseStart());
+  yield put(unityExerciseStart(options));
 }
 
 export function* exerciseCompleteSaga(action: IAction<UnityCompletePayload>) {
