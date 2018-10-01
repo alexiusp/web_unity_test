@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux';
 import { all, call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 
-import { BASE_PATH, CANVAS_ID } from '../../constants';
 import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
 import {
   UNITY_APP_INIT,
@@ -20,18 +19,17 @@ import {
   unityExerciseFailed,
   unityExerciseReady,
   unityExerciseRunning,
+  UnityInitPayload,
   unityLoaderStart,
   unityProgressUpdate,
   unityStop,
 } from '../actions/unity';
 import { IAction } from '../models/actions';
-import { IUnityInstance } from '../models/base';
 import { getAppConfig, getExerciseOptions, getExerciseSettings } from '../selectors/exercise';
 
-const BUILD_PATH = `${BASE_PATH}/Build`;
-const LOADER_NAME = 'UnityLoader';
-const appConfigPath = `${BUILD_PATH}/Production.json`;
-
+export interface IUnityInstance {
+  SendMessage: (objectName: string, methodName: string, value: string) => void,
+};
 let instance: IUnityInstance;
 
 declare var UnityLoader: any;
@@ -59,7 +57,8 @@ function getTimestamp() {
   return Math.trunc(Date.now() / 1000);
 }
 
-export function unityInitSaga(dispatch: Dispatch) {
+export function unityInitSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
+  const { basePath, loaderName } = action.payload;
   startTime = getTimestamp();
   console.time(timerName);
   // app started handler
@@ -73,7 +72,8 @@ export function unityInitSaga(dispatch: Dispatch) {
   // error handler
   window.exerciseFailed = (e: Error) => dispatch(unityExerciseFailed(e.message));
   const script = document.createElement('script');
-  const loaderPath = BUILD_PATH + '/' + LOADER_NAME + '.js?rnd=' + getCacheBuster();
+  const BUILD_PATH = `${basePath}/Build`;
+  const loaderPath = BUILD_PATH + '/' + loaderName + '.js?rnd=' + getCacheBuster();
   script.src = loaderPath;
   script.onload = () => dispatch(unityLoaderStart());
   script.async = true;
@@ -81,22 +81,25 @@ export function unityInitSaga(dispatch: Dispatch) {
   dispatch(consoleLog(`${timerName} started at ${startTime}`));
 }
 
-export function* unityLoaderStartSaga(dispatch: Dispatch) {
+export function* unityLoaderStartSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
+  const { basePath, canvasId } = action.payload;
   yield put(consoleLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
   // const path = appConfigPath + '?rnd=' + getCacheBuster();
   const onProgress = (inst: IUnityInstance, progress: number) => dispatch(unityProgressUpdate(progress));
-  instance = UnityLoader.instantiate(CANVAS_ID, appConfigPath, { onProgress });
+  const BUILD_PATH = `${basePath}/Build`;
+  const appConfigPath = `${BUILD_PATH}/Production.json`;
+  instance = UnityLoader.instantiate(canvasId, appConfigPath, { onProgress });
   yield put(consoleProgressStart());
 }
 
-export function* unityInitTransitionSaga(dispatch: Dispatch) {
+export function* unityInitTransitionSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
   // inject UnityLoader
-  yield fork(unityInitSaga, dispatch);
+  yield fork(unityInitSaga, dispatch, action);
   // wait for onLoad callback
   yield take(UNITY_LOADER_START);
   // instantiate app
-  yield fork(unityLoaderStartSaga, dispatch);
+  yield fork(unityLoaderStartSaga, dispatch, action);
 }
 
 // 'app ready' handler called when core app loaded
@@ -161,8 +164,8 @@ export function* sendMessage(objectName: string, methodName: string, value: any)
   }
 }
 
-export function* unityFlowStartSaga(dispatch: Dispatch) {
-  yield fork(unityInitTransitionSaga, dispatch);
+export function* unityFlowStartSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
+  yield fork(unityInitTransitionSaga, dispatch, action);
   // wait for appReady callback
   yield take(UNITY_APP_READY);
   yield fork(appReadySaga);

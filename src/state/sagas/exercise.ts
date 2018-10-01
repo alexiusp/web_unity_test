@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { all, put, select, take, takeEvery } from 'redux-saga/effects';
 
-import { CONFIG_PATH } from '../../constants';
+import { BASE_PATH, CANVAS_ID, CONFIG_PATH, LOADER_NAME } from '../../constants';
 import { consoleError, consoleLog } from '../actions/console';
 import { controlsOptionsUpdate, controlsSettingsUpdate } from '../actions/controls';
 import {
@@ -62,7 +62,7 @@ export function* selectExerciseSaga(action: IAction<{ name: string }>) {
 
 export function* startUnitySaga() {
   yield put(consoleLog('Start!'));
-  yield put(unityInit());
+  yield put(unityInit(BASE_PATH, CANVAS_ID, LOADER_NAME));
   yield take(UNITY_APP_READY);
   const isAuto = yield select(getAutoValue);
   if (isAuto) {

@@ -42,7 +42,12 @@ export const unityProgressUpdate = actionBuilder<UnityProgressPayload>(UNITY_PRO
 
 // inject unity loader into document
 export const UNITY_INIT = 'UNITY_INIT';
-export const unityInit = actionBuilder(UNITY_INIT);
+export interface UnityInitPayload {
+  basePath: string,
+  canvasId: string,
+  loaderName: string,
+}
+export const unityInit = actionBuilder<UnityInitPayload>(UNITY_INIT, 'basePath', 'canvasId', 'loaderName');
 
 // unity loader starts to load
 export const UNITY_LOADER_START = 'UNITY_LOADER_START';
