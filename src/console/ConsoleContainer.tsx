@@ -72,7 +72,7 @@ export class ConsoleContainer extends React.Component<Props, {}> {
 
   private scrollToBottom = () => {
     if (this.bottom) {
-      this.bottom.scrollIntoView({ behavior: "smooth" });
+      // this.bottom.scrollIntoView({ behavior: "smooth" });
     }
   }
 

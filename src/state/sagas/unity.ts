@@ -61,7 +61,7 @@ let startTime: number;
 const timerName = 'timer';
 
 export function unityInitSaga(dispatch: Dispatch) {
-  startTime = Date.now();
+  startTime = Math.trunc(Date.now() / 1000);
   console.log(`${timerName} started at ${startTime}`);
   console.time(timerName);
   // app started handler
