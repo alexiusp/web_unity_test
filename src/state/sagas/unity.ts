@@ -65,7 +65,6 @@ function getTimestamp() {
 
 export function unityInitSaga(dispatch: Dispatch) {
   startTime = getTimestamp();
-  console.log(`${timerName} started at ${startTime}`);
   console.time(timerName);
   // app started handler
   window.appReady = () => dispatch(unityAppReady());
@@ -83,6 +82,7 @@ export function unityInitSaga(dispatch: Dispatch) {
   script.onload = () => dispatch(unityLoaderStart());
   script.async = true;
   document.body.appendChild(script);
+  dispatch(consoleLog(`${timerName} started at ${startTime}`));
 }
 
 export function* unityLoaderStartSaga(dispatch: Dispatch) {
@@ -118,7 +118,7 @@ export function* appInitSaga() {
   const config = JSON.parse(configStr);
   config.startedAt = startTime;
   const finishedAt = getTimestamp();
-  console.log(`${timerName} finished at ${finishedAt}`);
+  yield put(consoleLog(`${timerName} finished at ${finishedAt}`));
   console.timeEnd(timerName);
   yield call(sendMessage, 'Main', 'InitializeApp', JSON.stringify(config));
   yield put(consoleProgressStart());
