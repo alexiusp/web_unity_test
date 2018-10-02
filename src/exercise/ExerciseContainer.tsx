@@ -6,7 +6,7 @@ import './ExerciseContainer.css';
 import { IAppState, RunningStage } from '../state/models/state';
 import { getCurrentStage } from '../state/selectors/controls';
 
-import ExerciseView from './views/ExerciseView';
+import UnityView from '../unity/UnityView';
 import IntroView from './views/IntroView';
 import LoadingProgressView from './views/LoadingProgressView';
 
@@ -49,7 +49,7 @@ export function ExerciseContainerView(props: Props) {
         <IntroView />
       </div>
       <div className={getViewClass(CurrentView.Exercise, props.stage)}>
-        <ExerciseView />
+        <UnityView />
       </div>
     </div>
   );

@@ -1,18 +1,18 @@
 import {
-  CONTROLS_AUTO_UPDATE,
-  CONTROLS_CONFIG_UPDATE,
-  CONTROLS_FORM_TOGGLE,
-  CONTROLS_OPTIONS_UPDATE,
-  CONTROLS_SETTINGS_UPDATE,
-} from '../actions/controls';
-import {
   UNITY_ENGINE_READY,
   UNITY_EXERCISE_COMPLETE,
   UNITY_EXERCISE_READY,
   UNITY_EXERCISE_RUNNING,
   UNITY_INIT,
   UNITY_STOP,
-} from '../actions/unity';
+} from '../../unity/store/actions';
+import {
+  CONTROLS_AUTO_UPDATE,
+  CONTROLS_CONFIG_UPDATE,
+  CONTROLS_FORM_TOGGLE,
+  CONTROLS_OPTIONS_UPDATE,
+  CONTROLS_SETTINGS_UPDATE,
+} from '../actions/controls';
 import { IAction, IBaseAction } from '../models/actions';
 import { EditForm, IControlsState, RunningStage } from '../models/state';
 

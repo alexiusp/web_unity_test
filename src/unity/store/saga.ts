@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
 import { all, call, fork, put, take, takeLatest } from 'redux-saga/effects';
 
+import { IAction } from '../../state/models/actions';
 import {
   UNITY_APP_INIT,
   UNITY_APP_READY,
@@ -29,8 +30,7 @@ import {
   unityLog,
   unityProgressUpdate,
   unityStop,
-} from '../actions/unity';
-import { IAction } from '../models/actions';
+} from './actions';
 
 export interface IUnityInstance {
   SendMessage: (objectName: string, methodName: string, value: string) => void,

@@ -2,6 +2,18 @@ import axios from 'axios';
 import { all, put, select, take, takeEvery } from 'redux-saga/effects';
 
 import { BASE_PATH, CANVAS_ID, CONFIG_PATH, LOADER_NAME } from '../../constants';
+import {
+  UNITY_APP_READY,
+  UNITY_ENGINE_READY,
+  UNITY_EXERCISE_COMPLETE,
+  UNITY_EXERCISE_READY,
+  unityAppInit,
+  UnityCompletePayload,
+  unityExerciseInit,
+  unityExerciseStart,
+  unityInit,
+  unityStop,
+} from '../../unity/store/actions';
 import { consoleError, consoleLog } from '../actions/console';
 import { controlsOptionsUpdate, controlsSettingsUpdate } from '../actions/controls';
 import {
@@ -21,18 +33,6 @@ import {
   exerciseSelect,
   exerciseSettingsUpdate,
 } from '../actions/exercise';
-import {
-  UNITY_APP_READY,
-  UNITY_ENGINE_READY,
-  UNITY_EXERCISE_COMPLETE,
-  UNITY_EXERCISE_READY,
-  unityAppInit,
-  UnityCompletePayload,
-  unityExerciseInit,
-  unityExerciseStart,
-  unityInit,
-  unityStop,
-} from '../actions/unity';
 import { IAction } from '../models/actions';
 import {
   getAppConfig,

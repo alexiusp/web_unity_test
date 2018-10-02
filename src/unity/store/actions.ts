@@ -1,4 +1,4 @@
-import actionBuilder from './actionBuilder';
+import actionBuilder from '../../state/actions/actionBuilder';
 
 /**
  * Unity exercise external callbacks

@@ -1,4 +1,10 @@
 import { takeRight } from 'lodash';
+
+import {
+  UNITY_ERROR,
+  UNITY_LOADING_END,
+  UNITY_LOG,
+} from '../../unity/store/actions';
 import {
   CONSOLE_COMMAND,
   CONSOLE_ERROR,
@@ -7,11 +13,6 @@ import {
   CONSOLE_PROGRESS_END,
   CONSOLE_PROGRESS_UPDATE,
 } from '../actions/console';
-import {
-  UNITY_ERROR,
-  UNITY_LOADING_END,
-  UNITY_LOG,
-} from '../actions/unity';
 import { IAction, IBaseAction } from '../models/actions';
 import { ILoggerMessage, LogType } from '../models/console';
 import { IConsoleState } from '../models/state';
