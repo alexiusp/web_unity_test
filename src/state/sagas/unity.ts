@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux';
 import { all, call, fork, put, take, takeLatest } from 'redux-saga/effects';
 
-import { consoleError, consoleLog, consoleProgressEnd, consoleProgressStart } from '../actions/console';
 import {
   UNITY_APP_INIT,
   UNITY_APP_READY,
@@ -16,6 +15,7 @@ import {
   UnityAppInitPayload,
   unityAppReady,
   unityEngineReady,
+  unityError,
   unityExerciseComplete,
   unityExerciseFailed,
   UnityExerciseInitPayload,
@@ -24,6 +24,9 @@ import {
   UnityExerciseStartPayload,
   UnityInitPayload,
   unityLoaderStart,
+  unityLoadingEnd,
+  unityLoadingStart,
+  unityLog,
   unityProgressUpdate,
   unityStop,
 } from '../actions/unity';
@@ -80,19 +83,19 @@ export function unityInitSaga(dispatch: Dispatch, action: IAction<UnityInitPaylo
   script.onload = () => dispatch(unityLoaderStart());
   script.async = true;
   document.body.appendChild(script);
-  dispatch(consoleLog(`${timerName} started at ${startTime}`));
+  dispatch(unityLog(`${timerName} started at ${startTime}`));
 }
 
 export function* unityLoaderStartSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
   const { basePath, canvasId } = action.payload;
-  yield put(consoleLog('UnityLoader onLoad called'));
+  yield put(unityLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
   // const path = appConfigPath + '?rnd=' + getCacheBuster();
   const onProgress = (inst: IUnityInstance, progress: number) => dispatch(unityProgressUpdate(progress));
   const BUILD_PATH = `${basePath}/Build`;
   const appConfigPath = `${BUILD_PATH}/Production.json`;
   instance = UnityLoader.instantiate(canvasId, appConfigPath, { onProgress });
-  yield put(consoleProgressStart());
+  yield put(unityLoadingStart());
 }
 
 export function* unityInitTransitionSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
@@ -106,8 +109,8 @@ export function* unityInitTransitionSaga(dispatch: Dispatch, action: IAction<Uni
 
 // 'app ready' handler called when core app loaded
 export function* appReadySaga() {
-  yield put(consoleLog('appReady called'));
-  yield put(consoleProgressEnd());
+  yield put(unityLog('appReady called'));
+  yield put(unityLoadingEnd());
 }
 
 export function* appInitSaga(configStr: string) {
@@ -115,11 +118,11 @@ export function* appInitSaga(configStr: string) {
   if (!endTime) {
     config.startedAt = startTime;
     endTime = getTimestamp();
-    yield put(consoleLog(`${timerName} finished at ${endTime} (=${endTime - startTime}s)`));
+    yield put(unityLog(`${timerName} finished at ${endTime} (=${endTime - startTime}s)`));
     console.timeEnd(timerName);
   }
   yield call(sendMessage, 'Main', 'InitializeApp', JSON.stringify(config));
-  yield put(consoleProgressStart());
+  yield put(unityLoadingStart());
 }
 
 export function* unityEngineStartupSaga(action: IAction<UnityAppInitPayload>) {
@@ -130,8 +133,8 @@ export function* unityEngineStartupSaga(action: IAction<UnityAppInitPayload>) {
   yield fork(appInitSaga, config);
   // wait for engineReady
   yield take(UNITY_ENGINE_READY);
-  yield put(consoleLog('engineReady called'));
-  yield put(consoleProgressEnd());
+  yield put(unityLog('engineReady called'));
+  yield put(unityLoadingEnd());
 }
 
 export function* exerciseStartupSaga(action: IAction<UnityExerciseInitPayload>) {
@@ -140,10 +143,10 @@ export function* exerciseStartupSaga(action: IAction<UnityExerciseInitPayload>) 
   }
   const settings = action.payload.settings;
   yield call(sendMessage, 'Main', 'InitializeExercise', settings);
-  yield put(consoleProgressStart());
+  yield put(unityLoadingStart());
   yield take(UNITY_EXERCISE_READY);
-  yield put(consoleLog('exerciseReady called'));
-  yield put(consoleProgressEnd());
+  yield put(unityLog('exerciseReady called'));
+  yield put(unityLoadingEnd());
 }
 
 export function* exerciseStartSaga(action: IAction<UnityExerciseStartPayload>) {
@@ -158,10 +161,10 @@ export function* exerciseStartSaga(action: IAction<UnityExerciseStartPayload>) {
 export function* sendMessage(objectName: string, methodName: string, value: any) {
   if (instance) {
     const params = typeof value === 'string' ? value : JSON.stringify(value);
-    yield put(consoleLog(`calling SendMessage('${objectName}', '${methodName}', '${params}')`));
+    yield put(unityLog(`calling SendMessage('${objectName}', '${methodName}', '${params}')`));
     instance.SendMessage(objectName, methodName, params);
   } else {
-    yield put(consoleError('Trying to send message to not initialized instance!'));
+    yield put(unityError('Trying to send message to not initialized instance!'));
     yield put(unityStop());
   }
 }

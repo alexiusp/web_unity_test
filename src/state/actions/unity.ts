@@ -81,3 +81,23 @@ export const unityExerciseRunning = actionBuilder(UNITY_EXERCISE_RUNNING);
 // stop everything
 export const UNITY_STOP = 'UNITY_STOP';
 export const unityStop = actionBuilder(UNITY_STOP);
+
+/**
+ * debugging features
+ */
+
+// log a message
+export const UNITY_LOG = 'UNITY_LOG';
+export const unityLog = actionBuilder<{ message: string }>(UNITY_LOG, 'message');
+
+// log an error
+export const UNITY_ERROR = 'UNITY_ERROR';
+export const unityError = actionBuilder<{ message: string }>(UNITY_ERROR, 'message');
+
+// set loading flag to true
+export const UNITY_LOADING_START = 'UNITY_LOADING_START';
+export const unityLoadingStart = actionBuilder(UNITY_LOADING_START);
+
+// set loading flag to false
+export const UNITY_LOADING_END = 'UNITY_LOADING_END';
+export const unityLoadingEnd = actionBuilder(UNITY_LOADING_END);
