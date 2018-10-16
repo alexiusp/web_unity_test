@@ -41,6 +41,8 @@ import {
   getExerciseSettings,
 } from '../selectors/controls';
 
+const DEFAULT_TIMEOUT = process.env.REACT_APP_DEFAULT_TIMEOUT || 120;
+
 export function* selectExerciseSaga(action: IAction<{ name: string }>) {
   const exerciseName = action.payload.name;
   const appSettingsResponse = yield axios.get(`${CONFIG_PATH}/${exerciseName}/Settings.json`);
@@ -54,9 +56,11 @@ export function* selectExerciseSaga(action: IAction<{ name: string }>) {
   if (appOptionsResponse.status !== 200) {
     return;
   }
-  const options = JSON.stringify(appOptionsResponse.data);
-  yield put(controlsOptionsUpdate(options));
-  yield put(exerciseOptionsUpdate(options));
+  const options = appOptionsResponse.data;
+  options.timeout = +DEFAULT_TIMEOUT;
+  const optionsStr = JSON.stringify(options);
+  yield put(controlsOptionsUpdate(optionsStr));
+  yield put(exerciseOptionsUpdate(optionsStr));
   yield put(exerciseReady());
 }
 
