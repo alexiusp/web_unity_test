@@ -7,6 +7,7 @@ import './App.css';
 import ConsoleContainer from './console/ConsoleContainer';
 import ControlsPanel from './controls/ControlsPanel';
 import ExerciseContainer from './exercise/ExerciseContainer';
+import LoadTest from './loadTest/LoadTest';
 import { consoleError } from './state/actions/console';
 import { DataCallback } from './state/models/base';
 
@@ -30,6 +31,7 @@ class App extends React.Component<Props, {}> {
           <ControlsPanel />
           <ExerciseContainer />
           <ConsoleContainer />
+          <LoadTest />
         </div>
       </div>
     );
