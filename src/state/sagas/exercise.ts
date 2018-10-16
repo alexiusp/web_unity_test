@@ -66,7 +66,13 @@ export function* selectExerciseSaga(action: IAction<{ name: string }>) {
 
 export function* startUnitySaga() {
   yield put(consoleLog('Start!'));
-  yield put(unityInit(BASE_PATH, CANVAS_ID, LOADER_NAME));
+  const customOptions = {
+    Module: {
+      CachedXMLHttpRequestSilent: true,
+      CachedXMLHttpRequestLoader: true,
+    },
+  };
+  yield put(unityInit(BASE_PATH, CANVAS_ID, LOADER_NAME, customOptions));
   yield take(UNITY_APP_READY);
   const isAuto = yield select(getAutoValue);
   if (isAuto) {

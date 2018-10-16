@@ -87,14 +87,16 @@ export function unityInitSaga(dispatch: Dispatch, action: IAction<UnityInitPaylo
 }
 
 export function* unityLoaderStartSaga(dispatch: Dispatch, action: IAction<UnityInitPayload>) {
-  const { basePath, canvasId } = action.payload;
+  const { basePath, canvasId, options = {} } = action.payload;
   yield put(unityLog('UnityLoader onLoad called'));
   // unity loader script loaded - ready to load engine
   // const path = appConfigPath + '?rnd=' + getCacheBuster();
   const onProgress = (inst: IUnityInstance, progress: number) => dispatch(unityProgressUpdate(progress));
   const BUILD_PATH = `${basePath}/Build`;
   const appConfigPath = `${BUILD_PATH}/Production.json`;
-  instance = UnityLoader.instantiate(canvasId, appConfigPath, { onProgress });
+  options.onProgress = onProgress;
+  instance = UnityLoader.instantiate(canvasId, appConfigPath, options);
+  yield put(unityLog(`UnityLoader.instantiate called with following params: ${canvasId}, ${appConfigPath}, ${JSON.stringify(options)}`));
   yield put(unityLoadingStart());
 }
 

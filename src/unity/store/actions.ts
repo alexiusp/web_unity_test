@@ -46,8 +46,9 @@ export interface UnityInitPayload {
   basePath: string,
   canvasId: string,
   loaderName: string,
+  options?: any,
 }
-export const unityInit = actionBuilder<UnityInitPayload>(UNITY_INIT, 'basePath', 'canvasId', 'loaderName');
+export const unityInit = actionBuilder<UnityInitPayload>(UNITY_INIT, 'basePath', 'canvasId', 'loaderName', 'options');
 
 // unity loader starts to load
 export const UNITY_LOADER_START = 'UNITY_LOADER_START';
