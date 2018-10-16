@@ -16,3 +16,8 @@
     margin: 0 auto;
   }
 }
+// fullscreen rules for webkit browsers
+.exercise canvas:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+}
