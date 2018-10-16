@@ -46,7 +46,7 @@ export default class LoadTest extends React.Component<{},LState> {
       return null;
     }
     return (
-      <header className="test">
+      <div className="test">
         <button className="test-toggle" onClick={this.toggle}>*</button>
         {this.state.show ? (
           <div className="animation-container">
@@ -57,7 +57,7 @@ export default class LoadTest extends React.Component<{},LState> {
             <div className="sprite black" style={{ animationDuration: '19s', animationDirection: 'alternate' }} ><span>{this.state.numbers[4]}</span></div>
           </div>
         ) : null}
-      </header>
+      </div>
     );
   }
 }

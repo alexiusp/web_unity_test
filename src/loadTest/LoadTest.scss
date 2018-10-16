@@ -5,8 +5,6 @@ $sprite-size: 40px;
   top: 0;
   right: 0;
   margin: 0;
-  height: $container-size;
-  width: $container-size;
   .test-toggle {
     position: absolute;
     top: 0;
@@ -21,6 +19,8 @@ $sprite-size: 40px;
   .animation-container {
     position: relative;
     height: $container-size;
+    height: $container-size;
+    width: $container-size;
     .sprite {
       position: absolute;
       height: $sprite-size;
