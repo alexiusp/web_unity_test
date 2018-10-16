@@ -1,17 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <title>Unity-Web communication Testing app</title>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+  <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+  <title>Unity-Web communication Testing app</title>
+  <script>
+    window.ss = window.ss || {};
+    window.ss.environment_type = "live";
+    window.ss.page_id = "15";
+    window.ss.api_url = "https://api.neuronation.com/api/v1/1";
+    window.ss.appVersion = "3.0.0";
+    window.ss.base_href = "";
+    window.ss.start_page_url = "/";
+    window.ss.legacy_url = "";
+    window.ss.mobile_landing_page_url = "/de/mobile/";
+    window.ss.checkout_url = "https://shop.neuronation.com";
+    window.ss.checkout_splittest_traffic = "100";
+    window.ss.base_href_localised = "https://sp.neuronation.com/de/";
+    window.ss.website_title = "NeuroNation";
+    window.ss.current_locale_alias = "de";
+    window.ss.current_url = window.location.href;
+    window.ss.current_timezone = new Date().getTimezoneOffset() * (-60);
+    window.ss.lang = "de_DE";
+    window.ss.fitness_test_url = "https://sp.neuronation.com/de/fitnesstest";
+    window.ss.fitness_test_evaluation_url = "https://sp.neuronation.com/de/fitnesstest-evaluation";
+    window.ss.course_url = "https://sp.neuronation.com/de/courses/memory/?ob=1";
+    window.ss.user_settings_url = "https://sp.neuronation.com/de/settings";
+    window.ss.subscribe_url = "https://sp.neuronation.com/de/subscribe";
+    window.ss.exercise_url = "https://sp.neuronation.com/de/exercise";
+    window.ss.exercises_url = "https://sp.neuronation.com/de/exercises";
+    window.ss.dashboard_url = "https://sp.neuronation.com/de/dashboard";
+    window.ss.user_progress_url = "https://sp.neuronation.com/de/progress";
+    window.ss.course_evaluation_url = "https://sp.neuronation.com/de/course-evaluation";
+    window.ss.courses_list_url = "https://sp.neuronation.com/de/courses-list";
+    window.ss.onboarding_version = 9;
+    window.ss.error_pages = {
+      "401": "https://sp.neuronation.com/de/",
+      "404": "https://sp.neuronation.com/de/page-not-found",
+    };
+    window.ss.current_page_type = "StartPage";
+    window.ss.protected_page_types = ["FitnessTestPage", "FitnessTestEvaluationPage", "SettingsPage", "DashboardPage", "ExercisesOverviewPage", "ExercisePage", "UserProgressPage", "CourseEvaluationPage", "CoursesListPage", "PremiumContentPage", "PremiumPage"];
+    window.ss.freemium_only_page_types = ["StartPage"];
+    window.ss.premium_only_page_types = ["DashboardPage", "ExercisesOverviewPage", "ExercisePage", "UserProgressPage", "CourseEvaluationPage", "CoursesListPage", "PremiumContentPage", "PremiumPage"];
+    window.ss.excluded_legacy_redirect_page_types = ["PasswordPage", "SettingsPage", "SubscribePage", "CustomSubscribePage", "ContentPage", "PremiumContentPage", "PremiumPage"];
+    window.ss.excluded_mobile_redirect_page_types = ["PasswordPage", "SubscribePage", "CustomSubscribePage", "ContentSectionPage", "MobilePage"];
+    window.ss.no_menu = ("" === true);
+    window.ss.no_fixed_menu = ("" === true);
+    window.ss.courseMap = { "20": { "name": "Ged\u00e4chtnis", "id": "20", "sortOrder": 0, "color": "purple", "skill": "Trainiert Ihre Merkf\u00e4higkeit", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "4 Wochen", "topics": "Arbeitsged\u00e4chtnis, Merkspanne", "description": "Dieser Kurs verbessert Ihr Arbeitsged\u00e4chtnis", "shortDescription": "<p>Mit diesem Kurs verbessern Sie effektiv und langfristig Ihr Ged\u00e4chtnis und bringen Ihr Erinnerungsverm\u00f6gen sowie Ihre Merkf\u00e4higkeit auf ein neues Niveau.<\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "link": "\/de\/courses\/memory\/", "showOnStartPage": 1 }, "21": { "name": "Konzentration", "id": "21", "sortOrder": 1, "color": "cyan", "skill": "Trainiert Ihre Aufmerksamkeit", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "4 Wochen", "topics": "Aufmerksamkeit, Konzentration", "description": "Dieser Kurs erh\u00f6ht Ihre Aufmerksamkeitsspanne", "shortDescription": "<p>Dieser wissenschaftlich entwickelte Kurs hilft Ihnen dabei, Ihre Konzentration und Ihre Aufmerksamkeit bei der Erf\u00fcllung Ihrer Aufgaben im Beruf und im Alltag sp\u00fcrbar zu st\u00e4rken.\u00a0<\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "link": "\/de\/courses\/concentration\/", "showOnStartPage": 1 }, "10": { "name": "MemoWork", "id": "10", "sortOrder": 2, "color": "turquoise", "skill": "Trainiert Ihre mentale Flexibilit\u00e4t", "skillLevel": "Fortgeschrittene", "timeline": "6 Wochen", "topics": "Denkgeschwindigkeit, Logik", "description": "Dieser Kurs trainiert Ihre kognitive Flexibilit\u00e4t", "shortDescription": "<p>Dieser Kurs kommt direkt aus einer Studie der Freien Universit\u00e4t Berlin und trainiert effektiv das Arbeitsged\u00e4chtnis. Damit k\u00f6nnen Sie Ihr Ged\u00e4chtnis, Ihr logisches Schlussfolgern und Ihre Lernf\u00e4higkeit steigern.\u00a0<\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "trustImage": "https:\/\/d2msx81u8ztsue.cloudfront.net\/uploads\/FUBerlin.jpeg", "link": "\/de\/courses\/memowork\/", "showOnStartPage": 1 }, "22": { "name": "Intelligenz", "id": "22", "sortOrder": 3, "color": "yellow", "skill": "Trainiert Ihr logisches Denken", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "4 Wochen", "topics": "Logisches Denken, Proleml\u00f6sef\u00e4higkeit", "description": "Dieser Kurs trainiert Ihre fluide Intelligenz", "shortDescription": "<p>Dieser Kurs ist f\u00fcr Menschen gedacht, die viele neue Informationen verarbeiten und gute Entscheidungen treffen m\u00fcssen. Er ist Ihr bester Begleiter, wenn Sie Ihre Denkgeschwindigkeit, Schlagfertigkeit und Entscheidungsqualit\u00e4t verbessern m\u00f6chten.<\/p>", "trustHeadline": "WISSENSCHAFTLICHE KOOPERATION:", "link": "\/de\/courses\/intelligence\/", "showOnStartPage": 1 }, "15": { "name": "Primus", "id": "15", "sortOrder": 4, "color": "magenta", "skill": "Trainiert Ihre Lernf\u00e4higkeit", "skillLevel": "Fortgeschrittene", "timeline": "7 Wochen", "topics": "Auffassungsgabe, Lernf\u00e4higkeit", "description": "Dieser Kurs steigert Ihre Lernf\u00e4higkeit", "shortDescription": "<p>Dieser Kurs steigert effektiv Ihre Aufnahmef\u00e4higkeit in der Karriere und im Studium und gibt Ihnen die M\u00f6glichkeit, schneller sowie effektiver lernen zu k\u00f6nnen.<\/p>", "trustHeadline": "WISSENSCHAFTLICHE KOOPERATION:", "link": "\/de\/courses\/primus\/", "showOnStartPage": 1 }, "999": { "name": "Equilibrium", "id": "999", "sortOrder": 5, "color": "grey", "skill": "Trainiert Ihr Sprachgeschick", "skillLevel": "Kurs wird noch entwickelt", "timeline": "Kurs wird noch entwickelt", "topics": "Sprachgeschick, Wortschatz", "description": "Dieser Kurs verbessert Ihre Rhetorik", "shortDescription": "<p>Dieser Kurs trainiert effektiv Ihr Sprachverm\u00f6gen und Sprachverst\u00e4ndnis und hilft Ihnen dabei, Ihren Wortschatz zu erweitern.<\/p>", "trustHeadline": "WISSENSCHAFTLICHE KOOPERATION:", "link": "\/de\/courses\/equilibrium\/", "showOnStartPage": 1 }, "44": { "name": "Konzentration II", "id": "44", "sortOrder": 6, "color": "cyan", "skill": "Trainiert Ihre Aufmerksamkeit", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "2 Wochen", "topics": "Aufmerksamkeit, Konzentration", "description": "Der Kurs erh\u00f6ht Ihre Aufmerksamkeitsspanne", "shortDescription": "<p><span>Dieser wissenschaftlich entwickelte Kurs hilft Ihnen dabei, Ihre Konzentration und Ihre Aufmerksamkeit bei der Erf\u00fcllung Ihrer Aufgaben im Beruf und im Alltag sp\u00fcrbar zu st\u00e4rken.\u00a0<\/span><\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "link": "\/de\/courses\/concentration-2\/", "showOnStartPage": 0 }, "45": { "name": "Intelligenz II", "id": "45", "sortOrder": 7, "color": "purple", "skill": "Trainiert Ihr logisches Denken", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "2 Wochen", "topics": "Logisches Denken, Proleml\u00f6sef\u00e4higkeit", "description": "Dieser Kurs trainiert Ihre fluide Intelligenz", "shortDescription": "<p><span>Dieser Kurs ist f\u00fcr Menschen gedacht, die viele neue Informationen verarbeiten und gute Entscheidungen treffen m\u00fcssen. Er ist Ihr bester Begleiter, wenn Sie Ihre Denkgeschwindigkeit, Schlagfertigkeit und Entscheidungsqualit\u00e4t verbessern m\u00f6chten.\u00a0<\/span><\/p>", "trustHeadline": "WISSENSCHAFTLICHE KOOPERATION:", "link": "\/de\/courses\/intelligence-2\/", "showOnStartPage": 0 }, "12": { "name": "MemoWork-Med", "id": "12", "sortOrder": 8, "color": "turquoise", "skill": "Trainiert Ihr Arbeitsged\u00e4chtnis", "skillLevel": "Fortgeschrittene", "timeline": "4 Wochen", "topics": "Denkgeschwindigkeit, Logik, Ged\u00e4chtnis", "description": "MemoWork-Med ist der Intensivkurs f\u00fcr das Arbeitsged\u00e4chtnis", "shortDescription": "<p><span>Dieser Kurs ist so intensiv wie die dazugeh\u00f6rige\u00a0<\/span><span>Studie <\/span><span>und garantiert Ihnen daher, dass Sie sp\u00fcrbare Ergebnisse haben werden. Sollten Sie nicht ausreichend Zeit daf\u00fcr haben, dann nehmen Sie bitte nicht diesen, sondern den normalen Kurs (MemoWork).<\/span><\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "trustImage": "https:\/\/d2msx81u8ztsue.cloudfront.net\/uploads\/FUBerlin.jpeg", "link": "\/de\/courses\/memowork-med\/", "showOnStartPage": 0 }, "43": { "name": "Ged\u00e4chtnis II", "id": "43", "sortOrder": 9, "color": "purple", "skill": "Trainiert Ihre Merkf\u00e4higkeit", "skillLevel": "Einsteiger und Fortgeschrittene", "timeline": "2 Wochen", "topics": "Arbeitsged\u00e4chtnis, Merkspanne", "description": "Dieser Kurs verbessert Ihr Arbeitsged\u00e4chtnis", "shortDescription": "<p><span>Mit diesem Kurs verbessern Sie effektiv und langfristig Ihr Ged\u00e4chtnis und bringen Ihr Erinnerungsverm\u00f6gen und Ihre Merkf\u00e4higkeit auf ein neues Niveau.<\/span><\/p>", "trustHeadline": "Wissenschaftliche Kooperation:", "link": "\/de\/courses\/memory-2\/", "showOnStartPage": 0 }, "41": { "name": "Schnelligkeit", "id": "41", "sortOrder": 10, "color": "magenta", "skill": "Trainiert Ihre Reaktionsschnelligkeit", "skillLevel": "Fortgeschrittene", "timeline": "4 Wochen", "topics": "Reaktionsschnelligkeit, Sensorik", "description": "Dieser Kurs verbessert Ihre Reaktionsschnelligkeit", "shortDescription": "<p><span>Mit diesem Kurs verk\u00fcrzen Sie effektiv und langfristig die Zeit, die zwischen eintreffendem Reiz und Ihrer Reaktion auf eben diesen vergeht.\u00a0<\/span><\/p>", "trustHeadline": null, "link": "\/de\/courses\/speed\/", "showOnStartPage": 0 } };
+
+    window.ss.disable_splittest = !!location.search && location.search.indexOf('disable_splittest') !== -1;
+
+    // Edison subsite id is 2;
+    window.ss.menus = { "Main": [{ "id": 1, "title": "Entdecken", "link": "\/de\/#explore", "mode": "link", "isNewWindow": false, "action": null }, { "id": 16, "title": "Kurse", "link": "\/de\/#courses", "mode": "link", "isNewWindow": false, "action": null }, { "id": 3, "title": "Wissenschaft", "link": "\/de\/science\/", "mode": "link", "isNewWindow": false, "action": null }], "Footer": [{ "id": 5, "title": "Wirksamkeit", "link": "https:\/\/www.neuronation.com\/science\/wissenschaftlich-nachgewiesen-zahlreiche-studien-belegen-wirksamkeit-von-gehirntraining?lang=de", "mode": "link", "isNewWindow": false, "action": null }, { "id": 11, "title": "Team", "link": "\/de\/team\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 6, "title": "Hilfe", "link": "https:\/\/support.neuronation.de\/hc\/de", "mode": "link", "isNewWindow": false, "action": "APP_HELP_OPEN" }, { "id": 30, "title": "Presse", "link": "\/de\/press\/", "mode": "link", "isNewWindow": false, "action": null }], "Legal": [{ "id": 13, "title": "Nutzungsbedingungen", "link": "\/de\/tou\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 14, "title": "Datenschutzerkl\u00e4rung", "link": "\/de\/dataprivacy\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 15, "title": "Impressum", "link": "\/de\/company\/", "mode": "link", "isNewWindow": false, "action": null }], "Premium": [{ "id": 25, "title": "Dashboard", "link": "\/de\/dashboard\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 26, "title": "\u00dcbungen", "link": "\/de\/exercises\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 27, "title": "Fortschritt", "link": "\/de\/progress\/", "mode": "link", "isNewWindow": false, "action": null }], "Science": [{ "id": 28, "title": "Wissenschaft", "link": "\/de\/science\/", "mode": "link", "isNewWindow": false, "action": null }, { "id": 29, "title": "Kooperationen", "link": "\/de\/science\/partnerships\/", "mode": "link", "isNewWindow": false, "action": null }] };
+  </script>
+  <script type="text/javascript" src="https://sp.neuronation.com/framework/thirdparty/jquery/jquery.js?m=1485864433"></script>
+  <script type="text/javascript" src="https://sp.neuronation.com/framework/javascript/i18n.js?m=1485864433"></script>
+  <script type="text/javascript" src="https://sp.neuronation.com/neuronation/javascript/lang/en.js?m=1539264438"></script>
+  <script type="text/javascript" src="https://sp.neuronation.com/neuronation/javascript/lang/de.js?m=1539264438"></script>
+  <script type="text/javascript" src="https://sp.neuronation.com/themes/edison/js/main.js?m=1539264698"></script>
+</head>
+
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <div id="root"></div>
+</body>
+
 </html>
